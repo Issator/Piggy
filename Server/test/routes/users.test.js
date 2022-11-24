@@ -1,4 +1,4 @@
-const app = require('../app')
+const app = require('../../app/app')
 const request = require('supertest')
 
 describe("POST /users/signup", () => {
@@ -46,14 +46,14 @@ describe("POST /users/signin", () => {
         login: "signIn",
     }
 
-    beforeAll(() => {
-        return request(app).post('/users/signup').send(params)
+    beforeAll(async () => {
+        await request(app).post('/users/signup').send(params)
     })
 
     test("should login user user", async () => {
         const req = {
             password: params.password,
-            login: params.email,
+            login: params.login,
         }
 
         const response = await request(app).post("/users/signin").send(req)
