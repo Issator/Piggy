@@ -1,6 +1,8 @@
 const {Request, Response, NextFunction} = require('express')
 const _data = require('../../data/users.json')
 const Validate = require('../functions/Validate')
+const jwt = require('jsonwebtoken')
+const { JWT_KEY } = require('../../config/config')
 
 /**
  * Get user by id
@@ -48,6 +50,7 @@ const signUp = (req, res, next) => {
     }
 
     newUser.id = (+_data[_data.length-1]?.id || 0) + 1
+    newUser.status = "user"
     _data.push(newUser)
     return res.status(201).send(newUser)
 }
@@ -74,8 +77,7 @@ const signIn = (req, res, next) => {
 
     // is password correct
     if(foundUser.password == password){
-        //TODO: add token and storage is
-        foundUser.token = foundUser.login + new Date().toLocaleTimeString()
+        foundUser.token = jwt.sign({id: foundUser.id, login: foundUser.login}, JWT_KEY)
         return res.send(foundUser)
     }else{
         return res.status(400).send({message: "Invalid password!"})
