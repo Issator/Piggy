@@ -283,6 +283,7 @@ describe("DEL /users/:id", () => {
         expect(response.statusCode).toBe(406)
         expect(response.body.message).toBeDefined()
     })
+
     test("Should fail (permission denied)", async () => {
         
         // change value
@@ -294,6 +295,7 @@ describe("DEL /users/:id", () => {
         expect(response.statusCode).toBe(406)
         expect(response.body.message).toBeDefined()
     })
+
     test("should delete user (delete itself)", async () => {
 
         // change value
@@ -307,6 +309,7 @@ describe("DEL /users/:id", () => {
         expect(response.body.email).toBeDefined()
         expect(response.body.password).toBeDefined()
     })
+
     test("should delete user (admin permission)", async () => {
         //login test user to get token
         const login = {
@@ -327,6 +330,7 @@ describe("DEL /users/:id", () => {
         expect(response.body.email).toBeDefined()
         expect(response.body.password).toBeDefined()
     })
+
     test("should fail (user dont exist)", async () => {
         //login test user to get token
         const login = {
@@ -342,9 +346,7 @@ describe("DEL /users/:id", () => {
         }
 
         const response = await request(app).del("/users/-1").send(req).set("token",admin_token)
-        expect(response.statusCode).toBe(200)
-        expect(response.body.login).toBeDefined()
-        expect(response.body.email).toBeDefined()
-        expect(response.body.password).toBeDefined()
+        expect(response.statusCode).toBe(400)
+        expect(response.body.message).toBeDefined()
     })
 })
