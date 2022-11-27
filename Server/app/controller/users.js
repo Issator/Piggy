@@ -160,9 +160,45 @@ const update = (req, res, next) => {
  * @param {NextFunction} next - next function
  */
 const remove = (req, res, next) => {
-    // Should delete user by given id
-    // DEL user/:ID
-    res.send("Delete user")
+    const {token} = req.headers
+    const toDelId = req.params.id
+    const {password} = req.body
+
+    //Validate data
+    if(!token)      {return res.status(400).send({message: "Token not received in header!"})}
+    if(!toDelId)    {return res.status(400).send({message: "User Id not received in params!"})}
+    if(!password)   {return res.status(400).send({message: "Password not received in body!"})}
+
+    //verify token
+    jwt.verify(token, JWT_KEY, (err, decoded) => {
+
+        // invalid token
+        if(err) {return res.status(400).send({message: "Invalid token!"})}
+
+        
+        //find user to verify password
+        const found = _data.find(user => user.id == decoded.id)
+
+        // no permission
+        if(found.id != toDelId && found.status != "admin"){
+            return res.status(406).send({message: "Permission denied!"})
+        }
+
+        if(found.password != password) {
+            return res.status(406).send({message: "Invalid password"})
+        }else{
+            const foundToDeleteIndex = _data.findIndex(user => user.id == toDelId)
+            // if not found
+            if(foundToDeleteIndex == -1){ 
+                return res.status(400).send({message: "User not found!"})
+            }else{
+                const deleteUserData = _data[foundToDeleteIndex]
+                _data.splice(foundToDeleteIndex,1)
+                return res.send(deleteUserData)
+            }
+
+        }
+    })
 }
 
 module.exports = {

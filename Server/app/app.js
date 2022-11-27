@@ -9,7 +9,7 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
-app.use('/product', productsRouter)
+app.use('/products', productsRouter)
 app.use('/users',   usersRouter   )
 
 

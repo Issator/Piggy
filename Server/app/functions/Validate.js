@@ -26,6 +26,19 @@ const email = (email) => {
 }
 
 /**
+ * Validate if date is correct.
+ * Must by bigger than current date
+ *
+ * @param {string} date date in YYYY-MM-DD format
+ */
+const time = (date) => {
+    const receiveDate = new Date(date)
+    const currentDate = new Date()
+
+    return currentDate < receiveDate
+}
+
+/**
  * Validate user for post request
  *
  * @param {JSON} user
@@ -51,6 +64,7 @@ const Validate = {
     password,
     email,
     postUser,
+    time
 }
 
 module.exports = Validate
