@@ -146,15 +146,15 @@ const remove = (req, res, next) => {
  * @param {Response}     res  - response
  * @param {NextFunction} next - next function
  */
-const payment = () => {
-    const decoded = req.locals.decoded
+const payment = (req, res, next) => {
+    const decoded = res.locals.decoded
     const prodId = req.params.id
 
     if(!prodId){
         return res.status(400).send({message: "Product Id not received!"})
     }
 
-    res.send("Should add payment to product")
+    return res.send("Should add payment to product")
 } 
 
 module.exports = {

@@ -119,6 +119,78 @@ describe("Test products", () => {
 
     })
 
+    describe("POST /product/payment", () => {
+
+        let dummyProduct = {
+            "name": "Dummy for testing payments",
+            "cost": "2050.50",
+            "end_date": "2030-12-12"
+        }
+    
+        let dummy_id = 0
+    
+    
+        beforeAll(async () => {
+            const product_id = await createDummyProduct(dummyProduct,dummy_token)
+            if (product_id) { dummy_id = product_id }
+        })
+
+        test("should fail - invalid value", async () => {
+            const req = {
+                product_id: 1,
+                amount: -100
+            }
+
+            const response = await request(app).post("/products/payment/" + dummy_id ).set("token", dummy_token).send(req)
+            expect(response.statusCode).toBe(400)
+            expect(response.body.message).toBeDefined()
+        })
+
+        test("should fail - product dont exist", async () => {
+            const req = {
+                product_id: -100,
+                amount: 100
+            }
+
+            const response = await request(app).post("/products/payment/" + dummy_id ).set("token", dummy_token).send(req)
+            expect(response.statusCode).toBe(400)
+            expect(response.body.message).toBeDefined()
+        })
+
+        test("should fail - permission denied", async () => {
+            //login test user to get token
+            const login = {
+                "login": "Test_User_02",
+                "password": "TestUser_02_P455WORD!"
+            }
+            const wrong_token = await getToken(login)
+
+            const req = {
+                product_id: 1,
+                amount: 100
+            }
+
+            const response = await request(app).post("/products/payment/" + dummy_id ).set("token", wrong_token).send(req)
+            expect(response.statusCode).toBe(406)
+            expect(response.body.message).toBeDefined()
+        })
+
+        test("should add payment to product", async () => {
+
+            const req = {
+                product_id: 1,
+                amount: 100
+            }
+
+            const response = await request(app).post("/products/payment/" + dummy_id ).set("token", dummy_token).send(req)
+            expect(response.statusCode).toBe(200)
+            expect(response.body.id).toBeDefined()
+            expect(response.body.product_id).toBe(req.product_id)
+            expect(response.body.id).toBe(req.amount)
+            expect(response.pay_date).toBeDefined()
+        })
+    })
+
     describe("GET /products/:id", () => {
         test("id: 1-> should return product with id = 1", async () => {
             const response = await request(app).get("/products/1").set("token",dummy_token)
@@ -128,6 +200,17 @@ describe("Test products", () => {
             expect(response.body.cost).toBeDefined()
             expect(response.body.end_date).toBeDefined()
             expect(response.body.end_savings).toBeFalsy()
+        })
+
+        test("id: 1 full -> should return full product with id = 1", async () => {
+            const response = await request(app).get("/products/1?full=true").set("token",dummy_token)
+            expect(response.statusCode).toBe(200)
+            expect(response.body.id).toBeDefined()
+            expect(response.body.name).toBeDefined()
+            expect(response.body.cost).toBeDefined()
+            expect(response.body.end_date).toBeDefined()
+            expect(response.body.end_savings).toBeFalsy()
+            expect(response.body.payments).toBeDefined()
         })
     
         test("id: -1 -> should return error because product dont exist", async () => {
