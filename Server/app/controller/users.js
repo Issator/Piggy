@@ -98,59 +98,39 @@ const signIn = (req, res, next) => {
  */
 const update = (req, res, next) => {
     const {login, password } = req.body
-    const {token} = req.headers
+    const decoded = res.locals.decoded
     const {id} = req.params
-
-    // no token
-    if(!token){
-        return res.status(400).send("No token received!")
+    
+    // found who send request
+    const requestUser = _data.find(user => user.id == decoded.id)
+    
+    //if no access
+    if(requestUser.id != id && requestUser.status != "admin"){
+        return res.status(406).send({message: "Access denied!"})
     }
     
-    // verify token
-    jwt.verify(token, JWT_KEY, (err, decoded) => {
-        // found who send request
-        const requestUser = _data.find(user => user.id == decoded.id)
-        
-        // if invalid token
-        if(err){
-            return res.status(400).send({message: "Invalid token!"})
-        }   
-        
-        //if no access
-        if(requestUser.id != id && requestUser.status != "admin"){
-            return res.status(406).send({message: "Access denied!"})
+    //get user
+    const found = _data.find(user => user.id == id)
+    if(!found){
+        return res.status(400).send({message: "User not found!"})
+    }
+
+    // if no data received
+    if(!login && !password){
+        return res.status(400).send("No data received! Required login or password!")
+    }
+
+    // change data
+    if(login)   { found.login = login }
+    if(password){ 
+        if(Validate.password(password)){
+            found.password = password 
+        }else{
+            return res.status(400).send({message: "Invalid new password!"})
         }
-        
-        //get user
-        const found = _data.find(user => user.id == id)
-        if(!found){
-            return res.status(400).send({message: "User not found!"})
-        }
+    }
 
-        // if no data received
-        if(!login && !password){
-            return res.status(400).send("No data received! Required login or password!")
-        }
-
-
-
-        // change data
-        if(login)   { found.login = login }
-        if(password){ 
-            if(Validate.password(password)){
-                found.password = password 
-            }else{
-                return res.status(400).send({message: "Invalid new password!"})
-            }
-        }
-
-        return res.status(200).send(found)
-    })
-
-
-    // Should update user by given id
-    // PUT user/:ID
-    res.send("Update user")
+    return res.status(200).send(found)
 }
 
 /**
@@ -160,45 +140,35 @@ const update = (req, res, next) => {
  * @param {NextFunction} next - next function
  */
 const remove = (req, res, next) => {
-    const {token} = req.headers
+    const decoded = res.locals.decoded
     const toDelId = req.params.id
     const {password} = req.body
 
-    //Validate data
-    if(!token)      {return res.status(400).send({message: "Token not received in header!"})}
     if(!toDelId)    {return res.status(400).send({message: "User Id not received in params!"})}
     if(!password)   {return res.status(400).send({message: "Password not received in body!"})}
-
-    //verify token
-    jwt.verify(token, JWT_KEY, (err, decoded) => {
-
-        // invalid token
-        if(err) {return res.status(400).send({message: "Invalid token!"})}
-
         
-        //find user to verify password
-        const found = _data.find(user => user.id == decoded.id)
+    //find user to verify password
+    const found = _data.find(user => user.id == decoded.id)
 
-        // no permission
-        if(found.id != toDelId && found.status != "admin"){
-            return res.status(406).send({message: "Permission denied!"})
-        }
+    // no permission
+    if(found.id != toDelId && found.status != "admin"){
+        return res.status(406).send({message: "Permission denied!"})
+    }
 
-        if(found.password != password) {
-            return res.status(406).send({message: "Invalid password"})
+    if(found.password != password) {
+        return res.status(406).send({message: "Invalid password"})
+    }else{
+        const foundToDeleteIndex = _data.findIndex(user => user.id == toDelId)
+        // if not found
+        if(foundToDeleteIndex == -1){ 
+            return res.status(400).send({message: "User not found!"})
         }else{
-            const foundToDeleteIndex = _data.findIndex(user => user.id == toDelId)
-            // if not found
-            if(foundToDeleteIndex == -1){ 
-                return res.status(400).send({message: "User not found!"})
-            }else{
-                const deleteUserData = _data[foundToDeleteIndex]
-                _data.splice(foundToDeleteIndex,1)
-                return res.send(deleteUserData)
-            }
-
+            const deleteUserData = _data[foundToDeleteIndex]
+            _data.splice(foundToDeleteIndex,1)
+            return res.send(deleteUserData)
         }
-    })
+
+    }
 }
 
 module.exports = {
