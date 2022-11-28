@@ -101,8 +101,7 @@ const update = (req, res, next) => {
         return res.status(400).send({message: "Product not found!"})
     }
 
-    //TODO: Add admin logic
-    if(decoded.id != found.user_id){
+    if(decoded.id != found.user_id && decoded.status != "admin"){
         return res.status(406).send({message: "Permission denied!"})
     }
 
@@ -132,8 +131,7 @@ const remove = (req, res, next) => {
         return res.status(400).send({message: "Product not found!"})
     }
 
-    //TODO: Add admin logic
-    if(decoded.id != _products[foundIndex].user_id){
+    if(decoded.id != _products[foundIndex].user_id && decoded.status != "admin"){
         return res.status(406).send({message: "Permission denied!"})
     }
 

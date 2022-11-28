@@ -83,7 +83,7 @@ const signIn = (req, res, next) => {
 
     // is password correct
     if(foundUser.password == password){
-        foundUser.token = jwt.sign({id: foundUser.id, login: foundUser.login}, JWT_KEY)
+        foundUser.token = jwt.sign({id: foundUser.id, login: foundUser.login, status: foundUser.status}, JWT_KEY)
         return res.send(foundUser)
     }else{
         return res.status(400).send({message: "Invalid password!"})

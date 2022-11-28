@@ -210,30 +210,30 @@ describe("Test products", () => {
             expect(response.body.message).toBeDefined()
         })
     
-        //TODO: Add admin permission
-        // test("should update product (admin)", async () => {
+        test("should update product (admin)", async () => {
     
-        //     // login test admin to get token
-        //     const login = {
-        //         "login": "Test_Admin",
-        //         "password": "TestAdmin_P455WORD!"
-        //     }
+            // login test admin to get token
+            const login = {
+                "login": "Test_Admin",
+                "password": "TestAdmin_P455WORD!"
+            }
             
-        //     const token = await getToken(login)
+            const token = await getToken(login)
             
-        //     // change value
-        //     const req = {
-        //         name: "No, its good TV!",
-        //         cost: "750.00"
-        //     }
+            // change value
+            const req = {
+                name: "No, its good TV!",
+                cost: "750.00"
+            }
     
-        //     //send request
-        //     const response = await request(app).put("/products/" + dummy_id).send(req).set("token", token)
-        //     expect(response.statusCode).toBe(200)
-        //     expect(response.body.id).toBeDefined()
-        //     expect(response.body.login).toBe(req.login)
-        //     expect(response.body.status).toBeDefined()
-        // })
+            //send request
+            const response = await request(app).put("/products/" + dummy_id).send(req).set("token", token)
+            expect(response.statusCode).toBe(200)
+            expect(response.body.id).toBeDefined()
+            expect(response.body.login).toBe(req.login)
+            expect(response.body.name).toBe(req.name)
+            expect(+response.body.cost).toBe(+req.cost)
+        })
     
         // NOTE: It work itself but not with rest? (when is lest than 0 ????)
         test("should fail (product dont exist)", async () => {
