@@ -26,7 +26,11 @@ const getById = (req, res, next) => {
         return res.status(404).send({message: "Permission denied!"})
     }
     
-    // TODO: If full send all data
+    if(full){
+        const payments = _payments[id]
+        foundProduct.payments = payments || []
+    }
+
     return res.send(foundProduct)
 }
 
@@ -148,10 +152,42 @@ const remove = (req, res, next) => {
  */
 const payment = (req, res, next) => {
     const decoded = res.locals.decoded
-    const prodId = req.params.id
+    const prodId = req.body.id
+    const amount = +req.body.amount
 
     if(!prodId){
         return res.status(400).send({message: "Product Id not received!"})
+    }
+
+    if(!amount || amount <= 0){
+        return res.status(400).send({message: "Invalid amount data!"})
+    }
+
+    const found = _products.find(product => product.id == prodId)
+    if(!found){
+        return res.status(400).send({message: "Product dont exist!"})
+    }
+
+    if(decoded.id != found.user_id && decoded.status != "admin"){
+        return res.status(406).send({message: "Permission denied!"})
+    }
+
+    // get payments
+    const foundPayments = _payments[prodId]
+    if(foundPayments){
+        // if payments exist
+        const date = new Date().toISOString()
+        const id = foundPayments.length + 1
+        const payment = {id, product_id: prodId, date, amount}
+        foundPayments.push(payment)
+        return res.status(201).send(payment)
+    }else{
+        // if first payment
+        const date = new Date().toISOString()
+        const id = 1
+        const payment = {id, product_id: prodId, pay_date: date, amount}
+        _payments[prodId] = [payment]
+        return res.status(201).send(payment)
     }
 
     return res.send("Should add payment to product")

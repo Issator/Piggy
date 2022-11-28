@@ -137,22 +137,22 @@ describe("Test products", () => {
 
         test("should fail - invalid value", async () => {
             const req = {
-                product_id: 1,
+                id: 1,
                 amount: -100
             }
 
-            const response = await request(app).post("/products/payment/" + dummy_id ).set("token", dummy_token).send(req)
+            const response = await request(app).post("/products/payment").set("token", dummy_token).send(req)
             expect(response.statusCode).toBe(400)
             expect(response.body.message).toBeDefined()
         })
 
         test("should fail - product dont exist", async () => {
             const req = {
-                product_id: -100,
+                id: -100,
                 amount: 100
             }
 
-            const response = await request(app).post("/products/payment/" + dummy_id ).set("token", dummy_token).send(req)
+            const response = await request(app).post("/products/payment").set("token", dummy_token).send(req)
             expect(response.statusCode).toBe(400)
             expect(response.body.message).toBeDefined()
         })
@@ -166,11 +166,11 @@ describe("Test products", () => {
             const wrong_token = await getToken(login)
 
             const req = {
-                product_id: 1,
+                id: 1,
                 amount: 100
             }
 
-            const response = await request(app).post("/products/payment/" + dummy_id ).set("token", wrong_token).send(req)
+            const response = await request(app).post("/products/payment").set("token", wrong_token).send(req)
             expect(response.statusCode).toBe(406)
             expect(response.body.message).toBeDefined()
         })
@@ -178,16 +178,16 @@ describe("Test products", () => {
         test("should add payment to product", async () => {
 
             const req = {
-                product_id: 1,
+                id: 1,
                 amount: 100
             }
 
-            const response = await request(app).post("/products/payment/" + dummy_id ).set("token", dummy_token).send(req)
-            expect(response.statusCode).toBe(200)
+            const response = await request(app).post("/products/payment").set("token", dummy_token).send(req)
+            expect(response.statusCode).toBe(201)
             expect(response.body.id).toBeDefined()
-            expect(response.body.product_id).toBe(req.product_id)
-            expect(response.body.id).toBe(req.amount)
-            expect(response.pay_date).toBeDefined()
+            expect(response.body.product_id).toBe(req.id)
+            expect(response.body.amount).toBe(req.amount)
+            expect(response.body.pay_date).toBeDefined()
         })
     })
 
