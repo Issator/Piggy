@@ -55,7 +55,6 @@ const createDummyUser = async (userData) => {
     }
 }
 
-// TODO: Connect with payments logic
 describe("Test products", () => {
 
     let dummy_token = ''
@@ -200,6 +199,8 @@ describe("Test products", () => {
             expect(response.body.cost).toBeDefined()
             expect(response.body.end_date).toBeDefined()
             expect(response.body.end_savings).toBeFalsy()
+            expect(response.body.daily).toBeDefined()
+            expect(response.body.left).toBeDefined()
         })
 
         test("id: 1 full -> should return full product with id = 1", async () => {
@@ -211,6 +212,8 @@ describe("Test products", () => {
             expect(response.body.end_date).toBeDefined()
             expect(response.body.end_savings).toBeFalsy()
             expect(response.body.payments).toBeDefined()
+            expect(response.body.daily).toBeDefined()
+            expect(response.body.left).toBeDefined()
         })
     
         test("id: -1 -> should return error because product dont exist", async () => {
@@ -380,21 +383,20 @@ describe("Test products", () => {
             expect(response.body.cost).toBeDefined()
         })
 
-        // TODO: Add admin permission
-        // test("should delete product (admin permission)", async () => {
-        //     //login test user to get token
-        //     const login = {
-        //         "login": "Test_Admin",
-        //         "password": "TestAdmin_P455WORD!"
-        //     }
-        //     const admin_token = await getToken(login)
+        test("should delete product (admin permission)", async () => {
+            //login test user to get token
+            const login = {
+                "login": "Test_Admin",
+                "password": "TestAdmin_P455WORD!"
+            }
+            const admin_token = await getToken(login)
     
-        //     const response = await request(app).del("/products/" + dummy_id).set("token",admin_token)
-        //     expect(response.statusCode).toBe(200)
-        //     expect(response.body.name).toBeDefined()
-        //     expect(response.body.end_date).toBeDefined()
-        //     expect(response.body.cost).toBeDefined()
-        // })
+            const response = await request(app).del("/products/" + dummy_id).set("token",admin_token)
+            expect(response.statusCode).toBe(200)
+            expect(response.body.name).toBeDefined()
+            expect(response.body.end_date).toBeDefined()
+            expect(response.body.cost).toBeDefined()
+        })
 
         // NOTE: It work itself but not with rest? (when is lest than 0 ????)
         test("should fail (product dont exist)", async () => {
@@ -412,6 +414,3 @@ describe("Test products", () => {
     })
 
 })
-
-
-

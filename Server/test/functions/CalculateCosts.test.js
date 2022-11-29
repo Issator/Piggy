@@ -56,4 +56,12 @@ describe("CalculateCosts tests", () => {
         expect(result.left).toBe(950)
         expect(result.daily).toBe('95.00')
     })
+
+    test("should return total cost and daily cost (no payments)", () => {
+        const newPayments = []
+
+        const result = CalculateCosts(DEFAULT.total, DEFAULT.endDate, newPayments)
+        expect(result.left).toBe(DEFAULT.total)
+        expect(result.daily).toBe('200.00')
+    })
 })

@@ -4,6 +4,7 @@ const _payments = require('../../data/payments.json')
 const Validate = require('../functions/Validate')
 const jwt = require('jsonwebtoken')
 const { JWT_KEY } = require('../../config/config')
+const { CalculateCosts } = require('../functions/CalculateCosts')
 
 /**
  * Get product by id
@@ -24,6 +25,14 @@ const getById = (req, res, next) => {
 
     if(foundProduct.user_id != decoded.id){
         return res.status(404).send({message: "Permission denied!"})
+    }
+
+    try{
+        const {left, daily} = CalculateCosts(foundProduct.cost, foundProduct.end_date, _payments[id])
+        foundProduct.left = left
+        foundProduct.daily = daily
+    }catch(error){
+        return res.status(400).send({message: "Failed to calculate payments: " + error})
     }
     
     if(full){
