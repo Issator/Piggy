@@ -34,6 +34,12 @@ const email = (email) => {
 const time = (date) => {
     const receiveDate = new Date(date)
     const currentDate = new Date()
+    
+    // check if correct date
+    const result = (receiveDate instanceof Date && !isNaN(receiveDate.valueOf()))
+    if(!result){
+        return false
+    }
 
     return currentDate < receiveDate
 }
