@@ -2,9 +2,9 @@ const {Request, Response, NextFunction } = require('express')
 const _products = require('../../data/products.json')
 const _payments = require('../../data/payments.json')
 const Validate = require('../functions/Validate')
-const jwt = require('jsonwebtoken')
-const { JWT_KEY } = require('../../config/config')
+const { TokenValues } = require('../functions/Token')
 const { CalculateCosts } = require('../functions/CalculateCosts')
+const errorMessage = require('../functions/ErrorMessage')
 
 /**
  * Get product by id
@@ -13,18 +13,19 @@ const { CalculateCosts } = require('../functions/CalculateCosts')
  * @param {NextFunction} next - next function
  */
 const getById = (req, res, next) => {
+    /** @type {TokenValues} */
+    const decoded = res.locals.decoded
     const id = req.params.id
     const full = req.query.full
-    const decoded = res.locals.decoded
 
     //find product
     const foundProduct = _products.find(product => product.id == id)
     if(!foundProduct){
-        return res.status(400).send({message: "Product not found!"})
+        return res.status(400).send(errorMessage("Product not found!"))
     }
 
     if(foundProduct.user_id != decoded.id){
-        return res.status(404).send({message: "Permission denied!"})
+        return res.status(404).send(errorMessage("Permission denied!"))
     }
 
     try{
@@ -32,7 +33,7 @@ const getById = (req, res, next) => {
         foundProduct.left = left
         foundProduct.daily = daily
     }catch(error){
-        return res.status(400).send({message: "Failed to calculate payments: " + error})
+        return res.status(400).send(errorMessage("Failed to calculate payments",error))
     }
     
     if(full){
@@ -51,6 +52,7 @@ const getById = (req, res, next) => {
  * @param {NextFunction} next - next function
  */
 const post = (req, res, next) => {
+    /** @type {TokenValues} */
     const decoded = res.locals.decoded
     const newProd = {
         name: req.body.name,
@@ -60,15 +62,15 @@ const post = (req, res, next) => {
 
     //validate
     if(!newProd.name){
-        return res.status(400).send({message: "Invalid product name!"})
+        return res.status(400).send(errorMessage("Invalid product name!"))
     }
 
     if(!newProd.cost || newProd.cost < 0){
-        return res.status(400).send({message: "Invalid cost!"})
+        return res.status(400).send(errorMessage("Invalid cost!"))
     }
 
     if(!newProd.end_date || !Validate.time(newProd.end_date)){
-        return res.status(400).send({message: "Invalid date!"})
+        return res.status(400).send(errorMessage("Invalid date!"))
     }
 
     //TODO: Add admin logic
@@ -88,6 +90,7 @@ const post = (req, res, next) => {
  * @param {NextFunction} next - next function
  */
 const update = (req, res, next) => {
+    /** @type {TokenValues} */
     const decoded = res.locals.decoded
     const prodId = req.params.id
     const newProductData = {
@@ -97,25 +100,26 @@ const update = (req, res, next) => {
     }
 
     if(!prodId){
-        return res.status(400).send({message: "Product Id not received!"})
+        return res.status(400).send(errorMessage("Product Id not received!"))
     }
 
     //validate
     if(newProductData.cost && newProductData.cost < 0){
-        return res.status(400).send({message: "Invalid cost!"})
+        return res.status(400).send(errorMessage("Invalid cost!"))
     }
 
     if(newProductData.end_date && !Validate.time(newProd.end_date)){
-        return res.status(400).send({message: "Invalid date!"})
+        return res.status(400).send(errorMessage("Invalid date!"))
     }
 
+    /** @type {*} */
     const found = _products.find(product => product.id == prodId)
     if(!found){
-        return res.status(400).send({message: "Product not found!"})
+        return res.status(400).send(errorMessage("Product not found!"))
     }
 
     if(decoded.id != found.user_id && decoded.status != "admin"){
-        return res.status(406).send({message: "Permission denied!"})
+        return res.status(406).send(errorMessage("Permission denied!"))
     }
 
     found.cost = newProductData.cost || found.cost
@@ -132,20 +136,21 @@ const update = (req, res, next) => {
  * @param {NextFunction} next - next function
  */
 const remove = (req, res, next) => {
+    /** @type {TokenValues} */
     const decoded = res.locals.decoded
     const prodId = req.params.id
 
     if(!prodId){
-        return res.status(400).send({message: "Product Id not received!"})
+        return res.status(400).send(errorMessage("Product Id not received!"))
     }
 
     const foundIndex = _products.findIndex(product => product.id == prodId)
     if(foundIndex == -1){
-        return res.status(400).send({message: "Product not found!"})
+        return res.status(400).send(errorMessage("Product not found!"))
     }
 
     if(decoded.id != _products[foundIndex].user_id && decoded.status != "admin"){
-        return res.status(406).send({message: "Permission denied!"})
+        return res.status(406).send(errorMessage("Permission denied!"))
     }
 
     const toDelete = _products[foundIndex]
@@ -160,25 +165,26 @@ const remove = (req, res, next) => {
  * @param {NextFunction} next - next function
  */
 const payment = (req, res, next) => {
+    /** @type {TokenValues} */
     const decoded = res.locals.decoded
     const prodId = req.body.id
     const amount = +req.body.amount
 
     if(!prodId){
-        return res.status(400).send({message: "Product Id not received!"})
+        return res.status(400).send(errorMessage("Product Id not received!"))
     }
 
     if(!amount || amount <= 0){
-        return res.status(400).send({message: "Invalid amount data!"})
+        return res.status(400).send(errorMessage("Invalid amount data!"))
     }
 
     const found = _products.find(product => product.id == prodId)
     if(!found){
-        return res.status(400).send({message: "Product dont exist!"})
+        return res.status(400).send(errorMessage("Product dont exist!"))
     }
 
     if(decoded.id != found.user_id && decoded.status != "admin"){
-        return res.status(406).send({message: "Permission denied!"})
+        return res.status(406).send(errorMessage("Permission denied!"))
     }
 
     // get payments
@@ -198,8 +204,6 @@ const payment = (req, res, next) => {
         _payments[prodId] = [payment]
         return res.status(201).send(payment)
     }
-
-    return res.send("Should add payment to product")
 } 
 
 module.exports = {

@@ -88,3 +88,27 @@ describe("post user", () => {
         expect(validate(test3)).toBe(false)
     })
 })
+
+describe("time", () => {
+    const validate = Validate.time
+    test("correct", () => {
+        // string value
+        expect(validate("2040-12-7")).toBe(true)
+
+        //different structure
+        expect(validate("8.07.2040")).toBe(true)
+
+        // date
+        let tenDays = new Date()
+        tenDays.setDate(tenDays.getDate() + 10)
+        expect(validate(tenDays)).toBe(true)
+    })
+
+    test("incorrect", () => {
+        // not a date
+        expect(validate("Aa!0")).toBe(false)
+
+        // date too old
+        expect(validate("2010-5-4")).toBe(false)
+    })
+})
