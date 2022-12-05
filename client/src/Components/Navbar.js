@@ -1,6 +1,18 @@
+import { useLocation } from "react-router-dom";
 import Dropdown from "./Dropdown";
 
+/** on with routes navbar should be hidden */
+const HIDE_ON_PAGE = ["/signup", "/signin", "/resetPassword", "/testArea"]
+
 export default function Navbar(){
+
+    // Hide navbar if route in HIDE_ON_PAGE 
+    const location = useLocation()
+    const contain = HIDE_ON_PAGE.filter(path => path === location.pathname)
+    if(contain.length > 0){
+        return;
+    }
+
     return (
         <nav className="row bg-primary text-white p-2 m-0">
             <div className="d-flex justify-content-between align-items-center">
