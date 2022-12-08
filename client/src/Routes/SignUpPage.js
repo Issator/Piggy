@@ -1,6 +1,107 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function SignUpPage() {
+
+    const [login, setLogin] = useState("")
+    const [password, setPassword] = useState("")
+    const [email, setEmail] = useState("")
+
+    const [alert, setAlert] = useState(false)
+
+    const [isLoginValid, setLoginValid] = useState(true)
+    const [isPasswordValid, setPasswordValid] = useState(true)
+    const [isEmailValid, setEmailValid] = useState(true)
+
+    /**
+     * Validate login if correct
+     * @param {string} value - email
+     * @returns {boolean} - email validation result
+     */
+    const validateEmail = (value) => {
+        const regex = /^\w+@[a-zA-Z_]+?(\.[a-zA-Z]+)*?\.[a-zA-Z]{2,3}$/
+        const result = regex.test(value)
+        setEmailValid(result)
+        return result
+    }
+
+    /**
+     * Validate login if correct
+     * @param {string} value - login
+     * @returns {boolean} - login validation result
+     */
+    const validateLogin = (value) => {
+        const result = (value !== "")
+        setLoginValid(result)
+        return result
+    }
+
+    /**
+     * Validate password if correct
+     * @param {string} value - password
+     * @returns {boolean} - password validation result
+     */
+     const validatePassword = (value) => {
+        const regex = /^(?=.*[0-9])(?=.*[~!@#$%^&*_\-+=|:;<>,.?])(?=.*[a-z])(?=.*[A-Z])(?=.{8,})/
+        const result = regex.test(value)
+        setPasswordValid(result)
+        return result
+    }
+
+    /**
+     * handle email change
+     * @param {React.ChangeEvent<HTMLInputElement>} e - Input event
+     */
+    const handleEmailChange = (e) => {
+        const {value} = e.target
+        validateEmail(value)
+        setEmail(value)
+    }
+
+    /**
+     * handle login change
+     * @param {React.ChangeEvent<HTMLInputElement>} e - Input event
+     */
+    const handleLoginChange = (e) => {
+        const {value} = e.target
+        validateLogin(value)
+        setLogin(value)
+    }
+
+    /**
+     * handle password change
+     * @param {React.ChangeEvent<HTMLInputElement>} e - Input event
+     */
+    const handlePasswordChange = (e) => {
+        const {value} = e.target
+        validatePassword(value)
+        setPassword(value)
+    }
+
+    /**
+     * handle login button click.
+     * Send request fro creating account to server
+     * @param {React.ChangeEvent<HTMLButtonElement>} e - Button event
+     */
+    const handleButtonClick = (e) => {
+
+        const loginResult    = validateLogin(login)
+        const emailResult    = validateEmail(email)
+        const passwordResult = validatePassword(password)
+
+        if(!loginResult || !emailResult || !passwordResult){
+            return
+        }
+
+        const toSend = {
+            login,password,email
+        }
+
+        setAlert(false)
+
+        e.preventDefault()
+    }
+
     return (
         <div className="full-center pb-5">
             <div>
@@ -11,33 +112,46 @@ export default function SignUpPage() {
                         <div className="form-group p-1">
                             <label htmlFor="emailInput">Email</label>
                             <input type="email"
-                                className={"form-control mt-1 mb-1 "}
+                                className={"form-control mt-1 mb-1 " + (isEmailValid ? "" : "is-invalid")}
                                 id="emailInput"
-                                placeholder="podaj email..."/>
+                                placeholder="podaj email..." 
+                                value={email}
+                                onChange={handleEmailChange}/>
                         </div>
 
                         {/* --- Login --- */}
                         <div className="form-group p-1">
                             <label htmlFor="loginInput">Login</label>
                             <input type="text"
-                                className={"form-control mt-1 mb-1 "}
+                                className={"form-control mt-1 mb-1 " + (isLoginValid ? "" : "is-invalid")}
                                 id="loginInput"
-                                placeholder="podaj login..."/>
+                                placeholder="podaj login..." 
+                                value={login}
+                                onChange={handleLoginChange}/>
                         </div>
 
                         {/* --- Hasło --- */}
                         <div className="form-group p-1">
                             <label htmlFor="passwordInput">Hasło</label>
                             <input type="password"
-                                className={"form-control mt-1 mb-1 "}
+                                className={"form-control mt-1 mb-1 " + (isPasswordValid ? "" : "is-invalid")}
                                 id="passwordInput"
-                                placeholder="podaj hasło..."/>
+                                placeholder="podaj hasło..." 
+                                value={password}
+                                onChange={handlePasswordChange}/>
+                            <small className="form-text ms-1">Hasło musi mieć min. 8 znaków, małą i dużą literę, liczbę i znak specjalny</small>
                         </div>
 
                         <div className="form-group p-1">
-                            <button className="btn btn-primary w-100 mt-3">
-                                        Zarejestruj się
+                            <button className="btn btn-primary w-100 mt-3" onClick={handleButtonClick}>
+                                Zarejestruj się
                             </button>
+
+                            {alert &&
+                                <div className="alert alert-danger mt-2 text-center" role="alert">
+                                    {alert}
+                                </div>
+                            }
                         </div>
                     </div>
                     <div className="card-footer">
