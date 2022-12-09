@@ -24,6 +24,7 @@ const getById = (req, res, next) => {
         return res.status(400).send(errorMessage("Product not found!"))
     }
 
+    // has access
     if(foundProduct.user_id != decoded.id){
         return res.status(404).send(errorMessage("Permission denied!"))
     }
@@ -42,6 +43,26 @@ const getById = (req, res, next) => {
     }
 
     return res.send(foundProduct)
+}
+
+/**
+ * Get list of all user products
+ * @param {Request}      req  - request
+ * @param {Response}     res  - response
+ * @param {NextFunction} next - next function
+ */
+const userProducts = (req, res, next) => {
+    /** @type {TokenValues} */
+    const decoded = res.locals.decoded
+    const id = req.params.id
+
+    //has access
+    if(id != decoded.id && decoded.status != "admin"){
+        return res.status(406).send(errorMessage("Permission denied!"))
+    }
+
+    const foundProducts = _products.filter(product => product.user_id == id)
+    return res.send(foundProducts)
 }
 
 
@@ -211,5 +232,6 @@ module.exports = {
     post,
     update,
     remove,
-    payment
+    payment,
+    userProducts
 }
