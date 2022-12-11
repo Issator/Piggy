@@ -3,6 +3,8 @@ const _data = require('../../data/users.json')
 const Validate = require('../functions/Validate')
 const jwt = require('jsonwebtoken')
 const { JWT_KEY } = require('../../config/config')
+const {TokenValues, Token} = require('../functions/Token')
+const errorMessage = require('../functions/ErrorMessage')
 
 /**
  * Get user by id
@@ -18,7 +20,7 @@ const getById = (req, res, next) => {
         delete toSend.password
         return res.send(toSend)
     }else{
-        return res.status(400).send({message: "User not found!"})
+        return res.status(400).send(errorMessage("User not found!"))
     }
 }
 
@@ -40,19 +42,19 @@ const signUp = (req, res, next) => {
     // validate
     const result = Validate.postUser(newUser)
     if(!result){
-        return res.status(400).send({message: "Validation failed!"})
+        return res.status(400).send(errorMessage("Validation failed!"))
     }
     
     // email already exist
     const foundEmail = _data.find(user => user.email == newUser.email)
     if(foundEmail){
-        return res.status(400).send({message: "Email already used!"})
+        return res.status(400).send(errorMessage("Email already used!"))
     }
 
     // user already exist
     const foundLogin = _data.find(user => user.login == newUser.login)
     if(foundLogin){
-        return res.status(400).send({message: "User already exist!"})
+        return res.status(400).send(errorMessage("User already exist!"))
     }
 
     newUser.id = (+_data[_data.length-1]?.id || 0) + 1
@@ -72,21 +74,21 @@ const signIn = (req, res, next) => {
     // get data
     const {login, password} = req.body
     if(!login || !password){
-        return res.status(400).send({message: "Missing data!"})
+        return res.status(400).send(errorMessage("Missing data!"))
     }
 
     // find user by login
     const foundUser = _data.find(user => user.login == login)
     if(!foundUser){
-        return res.status(400).send({message: "User not exist!"})
+        return res.status(400).send(errorMessage("User not exist!"))
     }
 
     // is password correct
     if(foundUser.password == password){
-        foundUser.token = jwt.sign({id: foundUser.id, login: foundUser.login, status: foundUser.status}, JWT_KEY)
+        foundUser.token = Token.generate(foundUser)
         return res.send(foundUser)
     }else{
-        return res.status(400).send({message: "Invalid password!"})
+        return res.status(400).send(errorMessage("Invalid password!"))
     }
 }
 
@@ -97,8 +99,9 @@ const signIn = (req, res, next) => {
  * @param {NextFunction} next - next function
  */
 const update = (req, res, next) => {
-    const {login, password } = req.body
+    /** @type {TokenValues} */
     const decoded = res.locals.decoded
+    const {login, password } = req.body
     const {id} = req.params
     
     // found who send request
@@ -106,18 +109,18 @@ const update = (req, res, next) => {
     
     //if no access
     if(requestUser.id != id && requestUser.status != "admin"){
-        return res.status(406).send({message: "Access denied!"})
+        return res.status(406).send(errorMessage("Access denied!"))
     }
     
     //get user
     const found = _data.find(user => user.id == id)
     if(!found){
-        return res.status(400).send({message: "User not found!"})
+        return res.status(400).send(errorMessage("User not found!"))
     }
 
     // if no data received
     if(!login && !password){
-        return res.status(400).send("No data received! Required login or password!")
+        return res.status(400).send(errorMessage("No data received! Required login or password!"))
     }
 
     // change data
@@ -126,7 +129,7 @@ const update = (req, res, next) => {
         if(Validate.password(password)){
             found.password = password 
         }else{
-            return res.status(400).send({message: "Invalid new password!"})
+            return res.status(400).send(errorMessage("Invalid new password!"))
         }
     }
 
@@ -140,28 +143,29 @@ const update = (req, res, next) => {
  * @param {NextFunction} next - next function
  */
 const remove = (req, res, next) => {
+    /** @type {TokenValues} */
     const decoded = res.locals.decoded
     const toDelId = req.params.id
     const {password} = req.body
 
-    if(!toDelId)    {return res.status(400).send({message: "User Id not received in params!"})}
-    if(!password)   {return res.status(400).send({message: "Password not received in body!"})}
+    if(!toDelId)    {return res.status(400).send(errorMessage("User Id not received in params!"))}
+    if(!password)   {return res.status(400).send(errorMessage("Password not received in body!"))}
         
     //find user to verify password
     const found = _data.find(user => user.id == decoded.id)
 
     // no permission
     if(found.id != toDelId && found.status != "admin"){
-        return res.status(406).send({message: "Permission denied!"})
+        return res.status(406).send(errorMessage("Permission denied!"))
     }
 
     if(found.password != password) {
-        return res.status(406).send({message: "Invalid password"})
+        return res.status(406).send(errorMessage("Invalid password"))
     }else{
         const foundToDeleteIndex = _data.findIndex(user => user.id == toDelId)
         // if not found
         if(foundToDeleteIndex == -1){ 
-            return res.status(400).send({message: "User not found!"})
+            return res.status(400).send(errorMessage("User not found!"))
         }else{
             const deleteUserData = _data[foundToDeleteIndex]
             _data.splice(foundToDeleteIndex,1)

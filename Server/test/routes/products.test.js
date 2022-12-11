@@ -118,6 +118,44 @@ describe("Test products", () => {
 
     })
 
+    describe("GET /product/getUsers/:id", () => {
+
+        test("should get products", async () => {
+            
+            //send request
+            const response = await request(app).get("/products/getUsers/" + dummy_id).set("token", dummy_token)
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toBeDefined()
+
+            // if array not empty
+            if(response.body.length > 0){
+                response.body.forEach(element => {                   
+                    expect(element.id).toBeDefined()
+                    expect(element.name).toBeDefined()
+                    expect(element.cost).toBeDefined()
+                    expect(element.end_date).toBeDefined()
+                    expect(element.end_savings).toBeFalsy()
+                });
+            }
+        })
+
+        test("should fail (Permission denied)", async () => {
+            
+            //login test user to get token
+            const login = {
+                "login": "Test_User_02",
+                "password": "TestUser_02_P455WORD!"
+            }
+            const token = await getToken(login)
+    
+    
+            //send request
+            const response = await request(app).get("/products/getUsers/" + dummy_id).set("token", token)
+            expect(response.statusCode).toBe(406)
+            expect(response.body.message).toBeDefined()
+        })
+    })
+
     describe("POST /product/payment", () => {
 
         let dummyProduct = {
