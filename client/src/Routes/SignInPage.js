@@ -1,8 +1,28 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import UserContext from "../Context/User";
+import serverError from "../Servers/serverError"
 
 export default function SignInPage() {
+
     const location = useLocation()
+    const userCtx = useContext(UserContext)
+
+    const defaultAlert = () => {
+        if(location.state && location.state.success){
+            return {
+                message: "Konto utworzone!", 
+                type: "success"
+            }
+        }else{
+            return {
+                message: null, 
+                type: null
+            }
+        }
+    }
+
+    const [alert, setAlert] = useState(defaultAlert())
 
     const [login, setLogin] = useState("")
     const [password, setPassword] = useState("")
@@ -78,6 +98,14 @@ export default function SignInPage() {
         const toSend = {
             login,password
         }
+
+        userCtx.login(login, password)
+               .catch(err => {
+                const error = serverError(err)
+                if(error){
+                    setAlert({message:error, type:"danger"})
+                }
+               })
     }
 
     return (
@@ -116,17 +144,18 @@ export default function SignInPage() {
                                 Zaloguj się
                             </button>
                         </div>
+
+                        { alert.message &&
+                            <div className={`alert alert-${alert.type} mt-2 mb-0 text-center`} role="alert">
+                                {alert.message}
+                            </div>
+                        }
+
                     </div>
 
                     <div className="card-footer">
                         <div className="text-center">nie masz konta? <Link to="/signup">Zarejestruj się!</Link></div>
                     </div>
-
-                    { location.state && location.state.success &&
-                        <div className="alert alert-success mt-2 text-center" role="alert">
-                            Konto utworzone pomyślnie!
-                        </div>
-                    }
 
                 </div>
             </div>

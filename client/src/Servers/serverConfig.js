@@ -1,8 +1,8 @@
 const config = {
-    PORT: 4001,
+    PORT: 4200,
     HOST: 'localhost'
 }
 
-const SERVER = `http://${config.HOST}:${config.PORT}/`
+const SERVER = `http://${config.HOST}:${config.PORT}`
 
 export default SERVER

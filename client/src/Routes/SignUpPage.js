@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import ServerError from "../Servers/serverError";
+import userServer from "../Servers/userServer";
 
 export default function SignUpPage() {
+    const navigate = useNavigate()
 
     const [login, setLogin] = useState("")
     const [password, setPassword] = useState("")
@@ -84,6 +87,7 @@ export default function SignUpPage() {
      * @param {React.ChangeEvent<HTMLButtonElement>} e - Button event
      */
     const handleButtonClick = (e) => {
+        e.preventDefault()
 
         const loginResult    = validateLogin(login)
         const emailResult    = validateEmail(email)
@@ -97,9 +101,16 @@ export default function SignUpPage() {
             login,password,email
         }
 
-        setAlert(false)
+        console.log(toSend)
+        userServer.signUp(toSend).then(response => {
+            navigate('/signin', {state: {success: true}})
+        }).catch(err => {
+            const error = ServerError(err)
+            if(error){
+                setAlert(error)
+            }
+        })
 
-        e.preventDefault()
     }
 
     return (
