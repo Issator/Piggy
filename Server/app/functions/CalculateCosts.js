@@ -20,7 +20,7 @@ exports.CalculateCosts = (total, end_date, payments) => {
     }
 
     //calculate payments
-    const sum = payments.reduce((s, payment) => s + payment.amount, 0)
+    const sum = payments ? payments.reduce((s, payment) => s + payment.amount, 0) : 0
     const leftToPay = total - sum
 
     const toSend = {

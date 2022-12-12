@@ -29,7 +29,7 @@ export function UserProvider(props) {
             console.log("Fail To collect data! Data removed!")
             clearData()
         }
-    })
+    }, [])
 
     const update = (newData) => {
         const allData = {...userData, ...newData}

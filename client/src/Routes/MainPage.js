@@ -1,15 +1,47 @@
 import ProductCard from "../Components/Cards/ProductCard"
 import NewProductCard from "../Components/Cards/NewProductCard"
+import { useContext, useEffect, useState } from "react"
+import productServer from "../Servers/productServer"
+import UserContext from "../Context/User"
+import NewProductModal from "../Components/Modal/NewProductModal"
 
 export default function MainPage(){
+    const [products, setProducts] = useState([])
+    const [showModal, setShowModal] = useState(false)
+    const userCtx = useContext(UserContext)
+
+    useEffect(() => {
+        const data = {...userCtx.data}
+        if(data.id && data.token){
+            productServer.getUsersProducts(data.id,data.token)
+                         .then(response => setProducts(response.data))
+                         .catch(error => console.error(error.response))
+        }
+    }, [userCtx])
+
+    const mapProducts = () => {
+        const generate = (data) => {
+            return (
+                <ProductCard name={data.name} 
+                             cost={data.cost} 
+                             end_date={data.end_date}
+                             left={data.left}
+                             daily={data.daily}
+                             key={data.id}
+                             />
+            )
+        }
+
+        return products.map(product => {return generate(product)})
+    }
+
+
     return (
         <div>
             <div>
-                <NewProductCard/>
-                <ProductCard name="produkt 1" cost="250.00" end_date="2023-1-12" left="122.25" daily="7.25"/>
-                <ProductCard name="produkt 2" cost="125.50" end_date="2023-2-08" left="112.45" daily="12.00" />
-                <ProductCard name="produkt 3" cost="55.60"  end_date="2023-6-17" left="23.60"  daily="3.42"  />
-                <ProductCard name="produkt 4" cost="149.99" end_date="2023-3-05" left="105.56" daily="12.56" />
+                {mapProducts()}
+                <NewProductCard onClick={() => setShowModal(true)}/>
+                {showModal && <NewProductModal onClose={() => {setShowModal(false)}}/>}
             </div>
         </div>
     )

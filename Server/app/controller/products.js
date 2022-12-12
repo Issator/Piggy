@@ -62,6 +62,16 @@ const userProducts = (req, res, next) => {
     }
 
     const foundProducts = _products.filter(product => product.user_id == id)
+
+    foundProducts.forEach(product => {
+        try{
+            const {left, daily} = CalculateCosts(product.cost, product.end_date, _payments[id])
+            product.left = left
+            product.daily = daily
+        }catch(error){
+            return res.status(400).send(errorMessage("Failed to calculate payments",error))
+        }
+    })
     return res.send(foundProducts)
 }
 

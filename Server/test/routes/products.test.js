@@ -133,6 +133,8 @@ describe("Test products", () => {
                     expect(element.id).toBeDefined()
                     expect(element.name).toBeDefined()
                     expect(element.cost).toBeDefined()
+                    expect(element.left).toBeDefined()
+                    expect(element.daily).toBeDefined()
                     expect(element.end_date).toBeDefined()
                     expect(element.end_savings).toBeFalsy()
                 });
@@ -215,7 +217,7 @@ describe("Test products", () => {
         test("should add payment to product", async () => {
 
             const req = {
-                id: 1,
+                id: dummy_id,
                 amount: 100
             }
 
@@ -229,8 +231,24 @@ describe("Test products", () => {
     })
 
     describe("GET /products/:id", () => {
-        test("id: 1-> should return product with id = 1", async () => {
-            const response = await request(app).get("/products/1").set("token",dummy_token)
+
+        let dummyProduct = {
+            "name": "Dummy for testing Get",
+            "cost": "2050.50",
+            "end_date": "2030-12-12"
+        }
+    
+        let dummy_id = 0
+    
+    
+        beforeAll(async () => {
+            const product_id = await createDummyProduct(dummyProduct,dummy_token)
+            if (product_id) { dummy_id = product_id }
+        })
+
+        test("should return product", async () => {
+            const response = await request(app).get("/products/" + dummy_id).set("token",dummy_token)
+            expect(response.body.message).not.toBeDefined()
             expect(response.statusCode).toBe(200)
             expect(response.body.id).toBeDefined()
             expect(response.body.name).toBeDefined()
@@ -241,8 +259,9 @@ describe("Test products", () => {
             expect(response.body.left).toBeDefined()
         })
 
-        test("id: 1 full -> should return full product with id = 1", async () => {
-            const response = await request(app).get("/products/1?full=true").set("token",dummy_token)
+        test("full -> should return full product", async () => {
+            const response = await request(app).get("/products/" + dummy_id + "?full=true").set("token",dummy_token)
+            expect(response.body.message).not.toBeDefined()
             expect(response.statusCode).toBe(200)
             expect(response.body.id).toBeDefined()
             expect(response.body.name).toBeDefined()

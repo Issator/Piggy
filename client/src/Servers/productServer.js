@@ -69,9 +69,9 @@ const remove = (id,token) => {
 /**
  * add payment to product
  * 
- * @param {Object}        payment            payment
- * @param {string|number} payment.id         - product id
- * @param {string|number} payment.amount     - payment amount
+ * @param {Object}        payment        payment
+ * @param {string|number} payment.id     - product id
+ * @param {string|number} payment.amount - payment amount
  * 
  * @param {string} token user token
  *
@@ -81,12 +81,25 @@ const payment = (payment, token) => {
     return axios.post(SERVER + "/products/payment", payment, {headers: {token: token}})
 }
 
+/**
+ * get all user products
+ * 
+ * @param {string} id    - payment
+ * @param {string} token - user token
+ *
+ * @returns {Promise<AxiosResponse<any,any>>} server response
+ */
+const getUsersProducts = (id, token) => {
+    return axios.get(SERVER + "/products/getUsers/" + id, {headers: {token: token}})
+}
+
 const productServer = {
     getById,
     post,
     update,
     remove,
-    payment
+    payment,
+    getUsersProducts
 }
 
 export default productServer
