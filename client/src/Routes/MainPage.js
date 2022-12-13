@@ -28,6 +28,24 @@ export default function MainPage(){
         }
     }
 
+    const reloadProduct = (id) => {
+        console.log("RELOAD")
+        productServer.getById(id, userCtx.data.token)
+                     .then(response => {
+                        const data = response.data
+                        // find and replace
+                        const allProducts = [...products]
+                        const foundIdx = allProducts.findIndex(product => product.id == response.data.id)
+                        if(foundIdx != -1){
+                            allProducts[foundIdx] = data
+                            setProducts(allProducts)
+                        }else{
+                            console.log("Failed to update product:" + id)
+                        }
+                     })
+                     .catch(error => console.error(error.response))
+    }
+
     const mapProducts = () => {
         const generate = (data) => {
             return (
@@ -37,6 +55,8 @@ export default function MainPage(){
                              left={data.left}
                              daily={data.daily}
                              key={data.id}
+                             id={data.id}
+                             reload={reloadProduct}
                              />
             )
         }
@@ -46,8 +66,8 @@ export default function MainPage(){
 
 
     return (
-        <div>
-            <div>
+        <div className="row p-0 m-0 justify-content-center">
+            <div className="row m-0 p-0">
                 {mapProducts()}
                 <NewProductCard onClick={() => setShowModal(true)}/>
                 {showModal && <NewProductModal onClose={() => {setShowModal(false)}} refresh={refresh}/>}

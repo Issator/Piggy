@@ -54,18 +54,18 @@ const getById = (req, res, next) => {
 const userProducts = (req, res, next) => {
     /** @type {TokenValues} */
     const decoded = res.locals.decoded
-    const id = req.params.id
+    const userId = req.params.id
 
     //has access
-    if(id != decoded.id && decoded.status != "admin"){
+    if(userId != decoded.id && decoded.status != "admin"){
         return res.status(406).send(errorMessage("Permission denied!"))
     }
 
-    const foundProducts = _products.filter(product => product.user_id == id)
+    const foundProducts = _products.filter(product => product.user_id == userId)
 
     foundProducts.forEach(product => {
         try{
-            const {left, daily} = CalculateCosts(product.cost, product.end_date, _payments[id])
+            const {left, daily} = CalculateCosts(product.cost, product.end_date, _payments[product.id])
             product.left = left
             product.daily = daily
         }catch(error){

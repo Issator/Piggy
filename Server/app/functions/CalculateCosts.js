@@ -24,7 +24,7 @@ exports.CalculateCosts = (total, end_date, payments) => {
     const leftToPay = total - sum
 
     const toSend = {
-        left: leftToPay,
+        left: leftToPay.toFixed(2),
         daily: (leftToPay / daysLeft).toFixed(2)
     }
     return toSend

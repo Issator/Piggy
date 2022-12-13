@@ -12,7 +12,7 @@ import SERVER from "./serverConfig";
  * @returns {Promise<AxiosResponse<any,any>>} server response
  */
 const getById = (id,token,full = false) => {
-    const path = SERVER + "/products/" + id + (full ? "?full=true" : null)
+    const path = SERVER + "/products/" + id + (full ? "?full=true" : "" )
     return axios.get(path, {headers: {token: token}})
 }
 
