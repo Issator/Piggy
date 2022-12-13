@@ -19,6 +19,15 @@ export default function MainPage(){
         }
     }, [userCtx])
 
+    const refresh = () => {
+        const data = {...userCtx.data}
+        if(data.id && data.token){
+            productServer.getUsersProducts(data.id,data.token)
+                         .then(response => setProducts(response.data))
+                         .catch(error => console.error(error.response))
+        }
+    }
+
     const mapProducts = () => {
         const generate = (data) => {
             return (
@@ -41,7 +50,7 @@ export default function MainPage(){
             <div>
                 {mapProducts()}
                 <NewProductCard onClick={() => setShowModal(true)}/>
-                {showModal && <NewProductModal onClose={() => {setShowModal(false)}}/>}
+                {showModal && <NewProductModal onClose={() => {setShowModal(false)}} refresh={refresh}/>}
             </div>
         </div>
     )
