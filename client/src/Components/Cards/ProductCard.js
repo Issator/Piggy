@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
-import {BiCalendar, BiMoney} from 'react-icons/bi'
+import {BiCalendar, BiCoin, BiCoinStack, BiMoney} from 'react-icons/bi'
 import UserContext from '../../Context/User'
+import price from '../../Functions/Price'
 import productServer from '../../Servers/productServer'
 import ProductsDetailsModal from '../Modal/ProductsDetailsModal'
 import Card from './Card'
@@ -51,17 +52,21 @@ export default function ProductCard(props){
         <Card>
             <div className="card-body">
 
-                <h3 className="pe-pointer" onClick={() => setShowModal(true)}>{props.name}</h3>
+                <h3 className="pe-pointer clamp-2 m-0 text-primary pe-pointer" onClick={() => setShowModal(true)}>{props.name}</h3>
 
-                <p title='Kwota / pozostało'>
-                    <BiMoney/> : <span className='text-primary-dark'>{props.cost}</span>/{props.left}
+                <p className='m-0' title='Kwota'>
+                    <BiCoinStack/> : {price(props.cost)}
                 </p>
 
-                <p title="data zakupu">
+                <p className='m-0' title='Pozostało'>
+                    <BiCoin/> : {price(props.left)}
+                </p>
+
+                <p className="m-0" title="data zakupu">
                     <BiCalendar/> : {props.end_date}
                 </p>
 
-                <div className='form-group mb-2'>
+                <div className='form-group my-2'>
                     <label htmlFor="amount">Odłóż kwotę</label>
                     <input type="number" 
                            className={`form-control ${!isValid && "is-invalid"}`} 

@@ -6,7 +6,7 @@ describe("CalculateCosts tests", () => {
     tenDaysLater = tenDaysLater.setDate(tenDaysLater.getDate() + 10);
 
     const DEFAULT = {
-        total: 2000,
+        total: "2000.00",
         endDate: tenDaysLater,
         payments: [
             {amount: 100},
@@ -31,7 +31,7 @@ describe("CalculateCosts tests", () => {
     test("should return rest and daily cost | test-1", () => {
 
         const result = CalculateCosts(DEFAULT.total, DEFAULT.endDate, DEFAULT.payments)
-        expect(result.left).toBe(1550)
+        expect(result.left).toBe('1550.00')
         expect(result.daily).toBe('155.00')
     })
 
@@ -40,7 +40,7 @@ describe("CalculateCosts tests", () => {
         hundredDaysLater = hundredDaysLater.setDate(hundredDaysLater.getDate() + 100);
 
         const result = CalculateCosts(DEFAULT.total, hundredDaysLater, DEFAULT.payments)
-        expect(result.left).toBe(1550)
+        expect(result.left).toBe('1550.00')
         expect(result.daily).toBe('15.50')
     })
 
@@ -53,7 +53,7 @@ describe("CalculateCosts tests", () => {
         ]
 
         const result = CalculateCosts(DEFAULT.total, DEFAULT.endDate, newPayments)
-        expect(result.left).toBe(950)
+        expect(result.left).toBe('950.00')
         expect(result.daily).toBe('95.00')
     })
 

@@ -14,3 +14,10 @@
 .pe-pointer {
     cursor: pointer;
 }
+
+.clamp-2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}

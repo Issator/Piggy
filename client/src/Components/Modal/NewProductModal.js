@@ -109,7 +109,7 @@ export default function({onClose,refresh}){
                     </div>
 
                     <div className="w-100 mt-3">
-                        <button className="btn btn-primary-dark w-100" onClick={submitData}>Dodaj</button>
+                        <button className="btn btn-primary w-100" onClick={submitData}>Dodaj</button>
                     </div>
 
                     {

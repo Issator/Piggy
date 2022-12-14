@@ -21,13 +21,13 @@ export default function Navbar(){
     }
 
     return (
-        <nav className="row bg-white border-bottom border-3 border-primary p-2 m-0">
+        <nav className="row position-sticky top-0 bg-white border border-3 rounded-4 border-primary p-2 m-1" style={{zIndex: "100"}}>
             <div className="d-flex justify-content-between align-items-center">
                 <div className="d-flex align-items-center">
                     <img src="piggy.png" style={{width: '50px', height: 'auto'}}/>
                     <h3 className="ms-2">Piggy</h3>
                 </div>
-                <Dropdown text={userCtx.data.login} id="accountDropdown" className="btn btn-outline-primary">
+                <Dropdown text={userCtx.data.login} id="accountDropdown" className="btn btn-outline-primary border border-white rounded-4">
                     <div className="dropdown-item pe-pointer">Produkty</div>
                     <div className="dropdown-item pe-pointer">Ustawienia konta</div>
                     <div className="dropdown-item pe-pointer" onClick={logoutButton}>Wyloguj się</div>
