@@ -28,22 +28,34 @@ export default function MainPage(){
         }
     }
 
-    const reloadProduct = (id) => {
-        console.log("RELOAD")
-        productServer.getById(id, userCtx.data.token)
-                     .then(response => {
-                        const data = response.data
-                        // find and replace
-                        const allProducts = [...products]
-                        const foundIdx = allProducts.findIndex(product => product.id == response.data.id)
-                        if(foundIdx != -1){
-                            allProducts[foundIdx] = data
-                            setProducts(allProducts)
-                        }else{
-                            console.log("Failed to update product:" + id)
-                        }
-                     })
-                     .catch(error => console.error(error.response))
+    const reloadProduct = (id,status) => {
+        if(status == "UPDATE"){
+            productServer.getById(id, userCtx.data.token)
+                         .then(response => {
+                            const data = response.data
+                            // find and replace
+                            const allProducts = [...products]
+                            const foundIdx = allProducts.findIndex(product => product.id == response.data.id)
+                            if(foundIdx != -1){
+                                allProducts[foundIdx] = data
+                                setProducts(allProducts)
+                            }else{
+                                console.log("Failed to update product:" + id)
+                            }
+                         })
+                         .catch(error => console.error(error.response))
+        }
+
+        if(status == "DELETE"){
+            const allProducts = [...products]
+            const foundIdx = allProducts.findIndex(product => product.id == id)
+            if(foundIdx != -1){
+                allProducts.splice(foundIdx, 1)
+                setProducts(allProducts)
+            }else{
+                console.log("Failed to remove product:" + id)
+            }
+        }
     }
 
     const mapProducts = () => {

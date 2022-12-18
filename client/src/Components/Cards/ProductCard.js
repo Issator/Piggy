@@ -32,7 +32,7 @@ export default function ProductCard(props){
         props.reload(props.id)
 
         productServer.payment(toSend,userCtx.data.token)
-                     .then(response => props.reload(props.id))
+                     .then(response => props.reload(props.id,"UPDATE"))
                      .catch(err => console.log(err.response))
     }
 
@@ -45,6 +45,14 @@ export default function ProductCard(props){
             if(isValid) {setIsValid(false)}
         }else{
             if(!isValid) {setIsValid(true)}
+        }
+    }
+
+    const handleChange = (status, data) => {
+        if(status == "DELETE"){
+            productServer.remove(props.id,userCtx.data.token)
+                         .then(response => props.reload(props.id,"DELETE"))
+                         .catch(err => console.log(err.response))
         }
     }
 
@@ -76,7 +84,7 @@ export default function ProductCard(props){
                 </div>
                 <button className="btn btn-primary" type="button" disabled={!isValid} onClick={submitPayment}>Odłóż</button>
             </div>
-            {showModal && <ProductsDetailsModal onClose={() => {setShowModal(false)}} id={props.id}/>}
+            {showModal && <ProductsDetailsModal onClose={() => {setShowModal(false)}} id={props.id} change={handleChange}/>}
         </Card>
     )
 }
