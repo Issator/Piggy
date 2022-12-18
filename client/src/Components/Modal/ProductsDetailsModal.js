@@ -3,12 +3,15 @@ import UserContext from "../../Context/User";
 import productServer from "../../Servers/productServer";
 import Modal from "./Modal";
 import price from "../../Functions/Price"
+import UpdateProductForm from "../Forms/UpdateProductFrom";
+import ServerError from "../../Servers/serverError";
+
+//FIXME: first payment date always N/A. WHY?
 
 /**
  * return for receiving validation result
  * @callback OnChange on change function
  * @param {("DELETE"|"UPDATE")} status function status
- * @param {Object} data update data, if status is "UPDATE"
  */
 
 /**
@@ -22,6 +25,9 @@ import price from "../../Functions/Price"
 export default function ProductsDetailsModal({onClose,id,change}){
     const userCtx = useContext(UserContext)
     const [product, setProduct] = useState({})
+    const [editMode, setEditMode] = useState(false)
+    const [editValue, setEditValue] = useState({})
+    const [alert, setAlert] = useState("")
 
     useEffect(() => {
         productServer.getById(id, userCtx.data.token, true)
@@ -56,6 +62,51 @@ export default function ProductsDetailsModal({onClose,id,change}){
         )
     }
 
+    const editButtonPressed = () => {
+        if(!editMode){
+            setEditMode(true)
+        }else{
+            productServer.update(id,editValue,userCtx.data.token)
+                     .then(response => {
+                        change("UPDATE")
+                        onClose()
+                     })
+                     .catch(err => {
+                        const error = ServerError(err)
+                        if(error){
+                            setAlert(error)
+                        }else{
+                            console.log(err)
+                            setAlert("Produkt nie został zmieniony!")
+                        }
+                     })
+        }
+    }
+
+    const handleEditChange = (data) => {
+        setEditValue(data)
+    }
+
+    const details = () => {
+        // show edit mode or data
+        if(editMode){
+            return(
+                <UpdateProductForm product={product} onChange={handleEditChange}/>
+            )
+        }else{
+            return(
+                <ul>
+                    <li>nazwa: {product.name}</li>
+                    <li>Koszt: {price(product.cost)}</li>
+                    <li>Pozostało: {price(product.left)}</li>
+                    <li>Data zakupu: {product.end_date ? new Date(product.end_date).toLocaleDateString() : "N/A"}</li>
+                </ul>
+            )
+        }
+
+
+    }
+
 
     return <Modal onClose={onClose}>
         <div className="card" style={{width: "25rem"}}>
@@ -66,11 +117,7 @@ export default function ProductsDetailsModal({onClose,id,change}){
 
                     <hr/>
                     <h5>Dane</h5>
-                    <ul>
-                        <li>Koszt: {price(product.cost)}</li>
-                        <li>Data zakupu: {product.end_date ? new Date(product.end_date).toLocaleDateString() : "N/A"}</li>
-                        <li>Pozostało: {price(product.left)}</li>
-                    </ul>
+                    {details()}
 
                     <hr/>
                     <h5>Płatności</h5>               
@@ -80,6 +127,7 @@ export default function ProductsDetailsModal({onClose,id,change}){
                         <button type="button" 
                                 className="btn btn-secondary-dark" 
                                 style={{width: '120px'}}
+                                onClick={editButtonPressed}
                         >Edytuj</button>
 
                         <button type="button" 
@@ -88,6 +136,12 @@ export default function ProductsDetailsModal({onClose,id,change}){
                                 onClick={deleteProduct}
                         >Usuń</button>
                     </div>
+
+                    {
+                        alert && <div className={`alert alert-danger mt-2 mb-0 text-center`} role="alert">
+                            {alert}
+                        </div>
+                    }
                 </div>
             </div>
     </Modal>

@@ -48,11 +48,14 @@ export default function ProductCard(props){
         }
     }
 
-    const handleChange = (status, data) => {
+    const handleChange = (status) => {
+        //TODO: move to modal?
         if(status == "DELETE"){
             productServer.remove(props.id,userCtx.data.token)
                          .then(response => props.reload(props.id,"DELETE"))
                          .catch(err => console.log(err.response))
+        }else if(status == "UPDATE"){
+            props.reload(props.id,"UPDATE")
         }
     }
 

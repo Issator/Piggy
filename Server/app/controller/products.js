@@ -139,7 +139,7 @@ const update = (req, res, next) => {
         return res.status(400).send(errorMessage("Invalid cost!"))
     }
 
-    if(newProductData.end_date && !Validate.time(newProd.end_date)){
+    if(newProductData.end_date && !Validate.time(newProductData.end_date)){
         return res.status(400).send(errorMessage("Invalid date!"))
     }
 
