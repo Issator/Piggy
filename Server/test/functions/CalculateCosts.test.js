@@ -64,4 +64,17 @@ describe("CalculateCosts tests", () => {
         expect(result.left).toBe(DEFAULT.total)
         expect(result.daily).toBe('200.00')
     })
+
+    test("should return zeros because product already saved", () => {
+        const newPayments = [
+            {amount: 100},
+            {amount: 200},
+            {amount: 300},
+            {amount: 400},
+        ]
+
+        const result = CalculateCosts(800, DEFAULT.endDate, newPayments)
+        expect(result.left).toBe('0.00')
+        expect(result.daily).toBe('0.00')
+    })
 })

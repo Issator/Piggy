@@ -23,11 +23,18 @@ exports.CalculateCosts = (total, end_date, payments) => {
     const sum = payments ? payments.reduce((s, payment) => s + payment.amount, 0) : 0
     const leftToPay = total - sum
 
-    const toSend = {
+    //already collected
+    if(leftToPay <= 0){
+        return{
+            left: "0.00",
+            daily: "0.00"
+        }
+    }
+
+    return{
         left: leftToPay.toFixed(2),
         daily: (leftToPay / daysLeft).toFixed(2)
     }
-    return toSend
 }
 
 /**

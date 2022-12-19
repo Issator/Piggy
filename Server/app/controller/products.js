@@ -29,12 +29,20 @@ const getById = (req, res, next) => {
         return res.status(404).send(errorMessage("Permission denied!"))
     }
 
-    try{
-        const {left, daily} = CalculateCosts(foundProduct.cost, foundProduct.end_date, _payments[id])
-        foundProduct.left = left
-        foundProduct.daily = daily
-    }catch(error){
-        return res.status(400).send(errorMessage("Failed to calculate payments",error))
+    // if not collected yet
+    if(!foundProduct.end_savings){
+        try{
+            const {left, daily} = CalculateCosts(foundProduct.cost, foundProduct.end_date, _payments[id])
+            foundProduct.left = left
+            foundProduct.daily = daily
+
+            if(+left == 0){
+                foundProduct.end_savings = true
+            }
+
+        }catch(error){
+            return res.status(400).send(errorMessage("Failed to calculate payments",error))
+        }
     }
     
     if(full){
@@ -64,12 +72,20 @@ const userProducts = (req, res, next) => {
     const foundProducts = _products.filter(product => product.user_id == userId)
 
     foundProducts.forEach(product => {
-        try{
-            const {left, daily} = CalculateCosts(product.cost, product.end_date, _payments[product.id])
-            product.left = left
-            product.daily = daily
-        }catch(error){
-            return res.status(400).send(errorMessage("Failed to calculate payments",error))
+        // if not collected yet
+        if(!product.end_savings){
+            try{
+                const {left, daily} = CalculateCosts(product.cost, product.end_date, _payments[product.id])
+                product.left = left
+                product.daily = daily
+    
+                if(+left == 0){
+                    product.end_savings = true
+                }
+    
+            }catch(error){
+                return res.status(400).send(errorMessage("Failed to calculate payments",error))
+            }
         }
     })
     return res.send(foundProducts)
@@ -224,7 +240,7 @@ const payment = (req, res, next) => {
         // if payments exist
         const date = new Date().toISOString()
         const id = foundPayments.length + 1
-        const payment = {id, product_id: prodId, date, amount}
+        const payment = {id, product_id: prodId, pay_date: date, amount}
         foundPayments.push(payment)
         return res.status(201).send(payment)
     }else{

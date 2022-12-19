@@ -162,7 +162,7 @@ describe("Test products", () => {
 
         let dummyProduct = {
             "name": "Dummy for testing payments",
-            "cost": "2050.50",
+            "cost": "2050.00",
             "end_date": "2030-12-12"
         }
     
@@ -176,7 +176,7 @@ describe("Test products", () => {
 
         test("should fail - invalid value", async () => {
             const req = {
-                id: 1,
+                id: dummy_id,
                 amount: -100
             }
 
@@ -218,7 +218,7 @@ describe("Test products", () => {
 
             const req = {
                 id: dummy_id,
-                amount: 100
+                amount: 50
             }
 
             const response = await request(app).post("/products/payment").set("token", dummy_token).send(req)
@@ -227,6 +227,32 @@ describe("Test products", () => {
             expect(response.body.product_id).toBe(req.id)
             expect(response.body.amount).toBe(req.amount)
             expect(response.body.pay_date).toBeDefined()
+        })
+
+        test("should add payment to product and change flag to of end_savings", async () => {
+
+            const req = {
+                id: dummy_id,
+                amount: 2000
+            }
+
+            const response = await request(app).post("/products/payment").set("token", dummy_token).send(req)
+            expect(response.statusCode).toBe(201)
+            expect(response.body.id).toBeDefined()
+            expect(response.body.product_id).toBe(req.id)
+            expect(response.body.amount).toBe(req.amount)
+            expect(response.body.pay_date).toBeDefined()
+
+            const  prodResponse = await request(app).get("/products/" + dummy_id).set("token",dummy_token)
+            expect(prodResponse.body.message).not.toBeDefined()
+            expect(prodResponse.statusCode).toBe(200)
+            expect(prodResponse.body.id).toBeDefined()
+            expect(prodResponse.body.name).toBeDefined()
+            expect(prodResponse.body.cost).toBeDefined()
+            expect(prodResponse.body.end_date).toBeDefined()
+            expect(+prodResponse.body.daily).toBe(0)
+            expect(+prodResponse.body.left).toBe(0)
+            expect(prodResponse.body.end_savings).toBeTruthy()
         })
     })
 
