@@ -1,6 +1,10 @@
 const app = require('./app/app');
 const { PORT } = require('./config/config');
+const { mongoConnect } = require('./config/mongo');
 
-app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
+mongoConnect(() => {
+    console.log("Mongo connected!")
+    app.listen(PORT, () => {
+        console.log(`Listening on port ${PORT}`);
+    })
 })

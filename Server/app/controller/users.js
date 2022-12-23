@@ -1,10 +1,9 @@
-const {Request, Response, NextFunction} = require('express')
-const _data = require('../../data/users.json')
+const {Request, Response, NextFunction } = require('express')
 const Validate = require('../functions/Validate')
-const jwt = require('jsonwebtoken')
-const { JWT_KEY } = require('../../config/config')
 const {TokenValues, Token} = require('../functions/Token')
 const errorMessage = require('../functions/ErrorMessage')
+const User = require('../models/User')
+const { ObjectId } = require('mongodb')
 
 /**
  * Get user by id
@@ -13,15 +12,31 @@ const errorMessage = require('../functions/ErrorMessage')
  * @param {NextFunction} next - next function
  */
 const getById = (req, res, next) => {
-    const {id} = req.params
-    const found = _data.find(user => user.id == id)
-    if(found){
-        const toSend = {...found}
-        delete toSend.password
-        return res.send(toSend)
-    }else{
-        return res.status(400).send(errorMessage("User not found!"))
+    const id = req.params.id
+
+    // if id received
+    if(!id){
+        res.status(400).send(errorMessage("Id not received!"))
     }
+
+    // if id valid
+    if(!ObjectId.isValid(id)){
+        res.status(400).send(errorMessage("Id is not valid!"))
+    }
+
+    User.getById(id)
+         .then(user => {
+             if(user){
+                 const toSend = {...user}
+                 delete toSend.password
+                 return res.send(toSend)
+             }else{
+                return res.status(400).send(errorMessage("User not found!"))
+             }
+         })
+         .catch(err => {
+             return res.status(500).send(errorMessage("Fail to receive user from database!"))
+         })
 }
 
 /**
@@ -33,34 +48,50 @@ const getById = (req, res, next) => {
 const signUp = (req, res, next) => {
 
     // should create user
-    const newUser = {
+    const newUserData = {
         login: req.body.login,
         password: req.body.password,
         email: req.body.email
     }
 
     // validate
-    const result = Validate.postUser(newUser)
+    const result = Validate.postUser(newUserData)
     if(!result){
         return res.status(400).send(errorMessage("Validation failed!"))
     }
     
     // email already exist
-    const foundEmail = _data.find(user => user.email == newUser.email)
-    if(foundEmail){
-        return res.status(400).send(errorMessage("Email already used!"))
-    }
+    return User.getAll({email: newUserData.email})
+        .then(response => {
+            if(response.length > 0){
+                return res.status(400).send(errorMessage("Email already used!"))
+            }
 
-    // user already exist
-    const foundLogin = _data.find(user => user.login == newUser.login)
-    if(foundLogin){
-        return res.status(400).send(errorMessage("User already exist!"))
-    }
+            // user already exist
+            User.getAll({login: newUserData.login})
+                .then(response => {
+                    if(response.length > 0){
+                        return res.status(400).send(errorMessage("User already exist!"))
+                    }
 
-    newUser.id = (+_data[_data.length-1]?.id || 0) + 1
-    newUser.status = "user"
-    _data.push(newUser)
-    return res.status(201).send(newUser)
+                    const newUser = User.create(newUserData)
+                    newUser.save()
+                           .then(response => {
+                                const toSend = newUser.toJSON()
+                                toSend._id = response.insertedId
+                                return res.status(201).send(toSend)
+                           })
+                           .catch(err => {
+                                return res.status(500).send(errorMessage("Fail to create new user!"))
+                            })
+                })
+                .catch(err => {
+                    return res.status(500).send(errorMessage("Fail to get users from database!"))
+                })
+        })
+        .catch(err => {
+            return res.status(500).send(errorMessage("Fail to get users from database!"))
+        })
 }
 
 /**
@@ -78,18 +109,26 @@ const signIn = (req, res, next) => {
     }
 
     // find user by login
-    const foundUser = _data.find(user => user.login == login)
-    if(!foundUser){
-        return res.status(400).send(errorMessage("User not exist!"))
-    }
+    return User.getAll({login: login})
+        .then(response => {
+            const found = response[0]
+            if(!found){
+                return res.status(400).send(errorMessage("User not exist!"))
+            }
 
-    // is password correct
-    if(foundUser.password == password){
-        foundUser.token = Token.generate(foundUser)
-        return res.send(foundUser)
-    }else{
-        return res.status(400).send(errorMessage("Invalid password!"))
-    }
+                // is password correct
+                if(found.password == password){
+                    found.token = Token.generate(found)
+                    delete found.password
+                    return res.send(found)
+                }else{
+                    return res.status(400).send(errorMessage("Invalid password!"))
+                }
+
+        })
+        .catch(err => {
+            return res.status(500).send(errorMessage("Fail to get users from database!"))
+        })
 }
 
 /**
@@ -103,19 +142,15 @@ const update = (req, res, next) => {
     const decoded = res.locals.decoded
     const {login, password } = req.body
     const {id} = req.params
-    
-    // found who send request
-    const requestUser = _data.find(user => user.id == decoded.id)
-    
-    //if no access
-    if(requestUser.id != id && requestUser.status != "admin"){
-        return res.status(406).send(errorMessage("Access denied!"))
+
+    // if id received
+    if(!id){
+        return res.status(400).send(errorMessage("Id not received!"))
     }
-    
-    //get user
-    const found = _data.find(user => user.id == id)
-    if(!found){
-        return res.status(400).send(errorMessage("User not found!"))
+
+    // if id valid
+    if(!ObjectId.isValid(id)){
+        return res.status(400).send(errorMessage("Id is not valid!"))
     }
 
     // if no data received
@@ -123,17 +158,47 @@ const update = (req, res, next) => {
         return res.status(400).send(errorMessage("No data received! Required login or password!"))
     }
 
-    // change data
-    if(login)   { found.login = login }
-    if(password){ 
-        if(Validate.password(password)){
-            found.password = password 
-        }else{
-            return res.status(400).send(errorMessage("Invalid new password!"))
-        }
+    if(password && !Validate.password(password)){ 
+        return res.status(400).send(errorMessage("Invalid new password!"))
     }
-
-    return res.status(200).send(found)
+    
+    // found who send request
+    return User.getById(decoded._id)
+               .then(requestUser => {
+               
+                   //if no access
+                   if(requestUser._id != id && requestUser.status != "admin"){
+                       return res.status(406).send(errorMessage("Access denied!"))
+                   }
+               
+                   //get user
+                   User.getById(id)
+                       .then(user => {
+                           if(!user){
+                               return res.status(400).send(errorMessage("User not found!"))
+                           }
+                       
+                           const newData = {...user, _id: id, ...{login, password}}
+                           const updatedUser = User.create(newData)
+                       
+                           updatedUser.save()
+                                      .then(response => {
+                                           const toSend = {...newData}
+                                           delete toSend.password
+                                           return res.status(200).send(toSend)
+                                      }) 
+                                      .catch(err => {
+                                           return res.status(500).send(errorMessage("Fail to update user!"))
+                                      })
+                               
+                       })
+                       .catch(err => {
+                               return res.status(500).send(errorMessage("Fail to get user to update!"))
+                        })
+               })
+               .catch(err => {
+                   return res.status(500).send(errorMessage("Fail to get request user!"))
+               })
 }
 
 /**
@@ -148,31 +213,44 @@ const remove = (req, res, next) => {
     const toDelId = req.params.id
     const {password} = req.body
 
+    // if id received
+    if(!toDelId){
+        return res.status(400).send(errorMessage("Id not received!"))
+    }
+
+    // if id valid
+    if(!ObjectId.isValid(toDelId)){
+        return res.status(400).send(errorMessage("Id is not valid!"))
+    }
+
     if(!toDelId)    {return res.status(400).send(errorMessage("User Id not received in params!"))}
     if(!password)   {return res.status(400).send(errorMessage("Password not received in body!"))}
         
     //find user to verify password
-    const found = _data.find(user => user.id == decoded.id)
+    return User.getById(decoded._id)
+               .then(found => {
+                       // no permission
+                       if(found._id != toDelId && found.status != "admin"){
+                           return res.status(406).send(errorMessage("Permission denied!"))
+                       }
 
-    // no permission
-    if(found.id != toDelId && found.status != "admin"){
-        return res.status(406).send(errorMessage("Permission denied!"))
-    }
-
-    if(found.password != password) {
-        return res.status(406).send(errorMessage("Invalid password"))
-    }else{
-        const foundToDeleteIndex = _data.findIndex(user => user.id == toDelId)
-        // if not found
-        if(foundToDeleteIndex == -1){ 
-            return res.status(400).send(errorMessage("User not found!"))
-        }else{
-            const deleteUserData = _data[foundToDeleteIndex]
-            _data.splice(foundToDeleteIndex,1)
-            return res.send(deleteUserData)
-        }
-
-    }
+                       //verify password
+                       if(found.password != password) {
+                           return res.status(406).send(errorMessage("Invalid password"))
+                       }
+                           
+                       // delete user
+                       User.getAndDeleteById(toDelId)
+                           .then(response => {
+                               return res.send(response)
+                           })
+                           .catch(err => {
+                               return res.status(500).send(errorMessage("Fail to delete user!"))
+                           })
+               })
+               .catch(err => {
+                   return res.status(500).send(errorMessage("Fail to get request user"))
+               })
 }
 
 module.exports = {

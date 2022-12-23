@@ -15,7 +15,7 @@ const { JWT_KEY } = require('../../config/config')
  * @returns {string} jwt token
  */
 const generate = (userData) => {
-    return jwt.sign({id: userData.id, login: userData.login, status: userData.status}, JWT_KEY)
+    return jwt.sign({_id: userData._id, login: userData.login, status: userData.status}, JWT_KEY)
 }
 
 exports.Token = {

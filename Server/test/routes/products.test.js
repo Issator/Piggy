@@ -1,5 +1,14 @@
 const app = require('../../app/app')
 const request = require('supertest')
+const { getDB } = require('../../config/mongo')
+const {MongoClient} = require('mongodb');
+
+let connection;
+let db;
+
+jest.mock('../../config/mongo', () => ({
+    getDB: jest.fn()
+}))
 
 /**
  * Request for login user into server to receive token.
@@ -29,9 +38,9 @@ const createDummyUser = async (userData) => {
     const response = await request(app).post('/users/signup').send(userData)
     if(response.ok) {
         const token = await getToken({login: userData.login, password: userData.password})
-        return {token: token, id: response.body.id}
+        return {token: token, _id: response.body._id}
     }else{
-        return {token: null, id: null}
+        return {token: null, _id: null}
     }
 }
 
@@ -49,7 +58,7 @@ const createDummyUser = async (userData) => {
  const createDummyProduct = async (productData, token) => {
     const response = await request(app).post('/products/add').send(productData).set('token', token)
     if(response.ok) {
-        return response.body.id
+        return response.body._id
     }else{
         return null
     }
@@ -60,7 +69,23 @@ describe("Test products", () => {
     let dummy_token = ''
     let dummy_id = 0
 
+    const ADMIN_DATA = {
+        "login": "Test_Admin_for_users",
+        "password": "TestAdmin_P455WORD!",
+        "status": "admin"
+    }
+
     beforeAll(async () => {
+        // connect to db
+        connection = await MongoClient.connect(globalThis.__MONGO_URI__, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        });
+        db = await connection.db(globalThis.__MONGO_DB_NAME__);
+        await db.collection('users').insertOne(ADMIN_DATA)
+        getDB.mockReturnValue(db)
+
+        // create dummy user
         const dummyUser = {
             "login": "Dummy_User_Products",
             "password": "Dummy_User_Products_P455WORD!",
@@ -70,9 +95,13 @@ describe("Test products", () => {
         const response = await createDummyUser(dummyUser)
         if (response.token){
             dummy_token = response.token
-            dummy_id = response.id
+            dummy_id = response._id
         }
-    })
+    });
+
+    afterAll(async () => {
+        await connection.close();
+    });
 
     describe("POST /products/add", () => {
         test("should create product", async () => {
@@ -84,11 +113,11 @@ describe("Test products", () => {
     
             const response = await request(app).post("/products/add").send(req).set("token", dummy_token)
             expect(response.statusCode).toBe(201)
-            expect(response.body.id).toBeDefined()
+            expect(response.body._id).toBeDefined()
             expect(response.body.name).toBe(req.name)
             expect(response.body.cost).toBe(+req.cost)
             expect(response.body.end_date).toBe(req.end_date)
-            expect(response.body.end_savings).toBeDefined()
+            expect(response.body.end_saving).toBeDefined()
             expect(response.body.user_id).toBe(dummy_id)
         })
     
@@ -124,13 +153,14 @@ describe("Test products", () => {
             
             //send request
             const response = await request(app).get("/products/getUsers/" + dummy_id).set("token", dummy_token)
+            expect(response.body.message).not.toBeDefined()
             expect(response.statusCode).toBe(200)
             expect(response.body).toBeDefined()
 
             // if array not empty
             if(response.body.length > 0){
                 response.body.forEach(element => {                   
-                    expect(element.id).toBeDefined()
+                    expect(element._id).toBeDefined()
                     expect(element.name).toBeDefined()
                     expect(element.cost).toBeDefined()
                     expect(element.left).toBeDefined()
@@ -144,11 +174,12 @@ describe("Test products", () => {
         test("should fail (Permission denied)", async () => {
             
             //login test user to get token
-            const login = {
-                "login": "Test_User_02",
-                "password": "TestUser_02_P455WORD!"
+            const dummyUser = {
+                "login": "Dummy_User_GUP_F01",
+                "password": "Dummy_User_GUP_F01_P455WORD!",
+                "email": "DummyUser_GUP_F01@piggy.com"
             }
-            const token = await getToken(login)
+            const {token,_id} = await createDummyUser(dummyUser)
     
     
             //send request
@@ -198,18 +229,19 @@ describe("Test products", () => {
 
         test("should fail - permission denied", async () => {
             //login test user to get token
-            const login = {
-                "login": "Test_User_02",
-                "password": "TestUser_02_P455WORD!"
+            const dummyUser = {
+                "login": "Dummy_User_GUP_F02",
+                "password": "Dummy_User_GUP_F02_P455WORD!",
+                "email": "DummyUser_GUP_F02@piggy.com"
             }
-            const wrong_token = await getToken(login)
+            const {token} = await createDummyUser(dummyUser)
 
             const req = {
-                id: 1,
+                id: dummy_id,
                 amount: 100
             }
 
-            const response = await request(app).post("/products/payment").set("token", wrong_token).send(req)
+            const response = await request(app).post("/products/payment").set("token", token).send(req)
             expect(response.statusCode).toBe(406)
             expect(response.body.message).toBeDefined()
         })
@@ -222,8 +254,9 @@ describe("Test products", () => {
             }
 
             const response = await request(app).post("/products/payment").set("token", dummy_token).send(req)
+            expect(response.body.message).not.toBeDefined()
             expect(response.statusCode).toBe(201)
-            expect(response.body.id).toBeDefined()
+            expect(response.body._id).toBeDefined()
             expect(response.body.product_id).toBe(req.id)
             expect(response.body.amount).toBe(req.amount)
             expect(response.body.pay_date).toBeDefined()
@@ -238,7 +271,7 @@ describe("Test products", () => {
 
             const response = await request(app).post("/products/payment").set("token", dummy_token).send(req)
             expect(response.statusCode).toBe(201)
-            expect(response.body.id).toBeDefined()
+            expect(response.body._id).toBeDefined()
             expect(response.body.product_id).toBe(req.id)
             expect(response.body.amount).toBe(req.amount)
             expect(response.body.pay_date).toBeDefined()
@@ -246,12 +279,12 @@ describe("Test products", () => {
             const  prodResponse = await request(app).get("/products/" + dummy_id).set("token",dummy_token)
             expect(prodResponse.body.message).not.toBeDefined()
             expect(prodResponse.statusCode).toBe(200)
-            expect(prodResponse.body.id).toBeDefined()
+            expect(prodResponse.body._id).toBeDefined()
             expect(prodResponse.body.name).toBeDefined()
             expect(prodResponse.body.cost).toBeDefined()
             expect(prodResponse.body.end_date).toBeDefined()
-            expect(+prodResponse.body.daily).toBe(0)
             expect(+prodResponse.body.left).toBe(0)
+            expect(+prodResponse.body.daily).toBe(0)
             expect(prodResponse.body.end_savings).toBeTruthy()
         })
     })
@@ -276,7 +309,7 @@ describe("Test products", () => {
             const response = await request(app).get("/products/" + dummy_id).set("token",dummy_token)
             expect(response.body.message).not.toBeDefined()
             expect(response.statusCode).toBe(200)
-            expect(response.body.id).toBeDefined()
+            expect(response.body._id).toBeDefined()
             expect(response.body.name).toBeDefined()
             expect(response.body.cost).toBeDefined()
             expect(response.body.end_date).toBeDefined()
@@ -289,7 +322,7 @@ describe("Test products", () => {
             const response = await request(app).get("/products/" + dummy_id + "?full=true").set("token",dummy_token)
             expect(response.body.message).not.toBeDefined()
             expect(response.statusCode).toBe(200)
-            expect(response.body.id).toBeDefined()
+            expect(response.body._id).toBeDefined()
             expect(response.body.name).toBeDefined()
             expect(response.body.cost).toBeDefined()
             expect(response.body.end_date).toBeDefined()
@@ -337,11 +370,11 @@ describe("Test products", () => {
             //send request
             const response = await request(app).put("/products/" + dummy_id).send(req).set("token", dummy_token)
             expect(response.statusCode).toBe(200)
-            expect(response.body.id).toBeDefined()
+            expect(response.body._id).toBeDefined()
             expect(response.body.name).toBe(req.name)
             expect(response.body.end_date).toBeDefined()
             expect(response.body.cost).toBeDefined()
-            expect(response.body.end_savings).toBeDefined()
+            expect(response.body.end_saving).toBeDefined()
         })
     
         test("should fail (price validation)", async () => {
@@ -361,11 +394,12 @@ describe("Test products", () => {
         test("should fail (Permission denied)", async () => {
             
             //login test user to get token
-            const login = {
-                "login": "Test_User_02",
-                "password": "TestUser_02_P455WORD!"
+            const dummyUser = {
+                "login": "Dummy_User_GUD_F01",
+                "password": "Dummy_User_GUD_F01_P455WORD!",
+                "email": "DummyUser_GUD_F01@piggy.com"
             }
-            const token = await getToken(login)
+            const {token} = await createDummyUser(dummyUser)
     
             // change value
             const req = {
@@ -380,48 +414,34 @@ describe("Test products", () => {
         })
     
         test("should update product (admin)", async () => {
-    
-            // login test admin to get token
-            const login = {
-                "login": "Test_Admin",
-                "password": "TestAdmin_P455WORD!"
-            }
-            
-            const token = await getToken(login)
             
             // change value
             const req = {
                 name: "No, its good TV!",
                 cost: "750.00"
             }
-    
+
+            const admin_token = await getToken(ADMIN_DATA)
+
             //send request
-            const response = await request(app).put("/products/" + dummy_id).send(req).set("token", token)
+            const response = await request(app).put("/products/" + dummy_id).send(req).set("token", admin_token)
+            expect(response.body.message).not.toBeDefined()
             expect(response.statusCode).toBe(200)
-            expect(response.body.id).toBeDefined()
+            expect(response.body._id).toBeDefined()
             expect(response.body.login).toBe(req.login)
             expect(response.body.name).toBe(req.name)
             expect(+response.body.cost).toBe(+req.cost)
         })
     
         // NOTE: It work itself but not with rest? (when is lest than 0 ????)
-        test("should fail (product dont exist)", async () => {
-            
-            // login test admin to get token
-            const login = {
-                "login": "Test_Admin",
-                "password": "TestAdmin_P455WORD!"
-            }
-    
-            const token = await getToken(login)
-    
+        test("should fail (product dont exist)", async () => {   
             // change value
             const req = {
                 name: "Its not even exist"
             }
     
             //send request
-            const response = await request(app).put("/products/10000").send(req).set("token", token)
+            const response = await request(app).put("/products/10000").send(req).set("token", dummy_token)
             expect(response.statusCode).toBe(400)
             expect(response.body.message).toBeDefined()
         })
@@ -446,11 +466,12 @@ describe("Test products", () => {
         test("Should fail (permission denied)", async () => {
 
             //log different user
-            const login = {
-                "login": "Test_User",
-                "password": "TestUser_P455WORD!",
+            const dummyUser = {
+                "login": "Dummy_User_GUP_F03",
+                "password": "Dummy_User_GUP_F03_P455WORD!",
+                "email": "DummyUser_GUP_F03@piggy.com"
             }
-            const token = await getToken(login)
+            const {token} = await createDummyUser(dummyUser)
 
             const response = await request(app).del("/products/" + dummy_id).set("token",token)
             expect(response.statusCode).toBe(406)
@@ -460,6 +481,7 @@ describe("Test products", () => {
         test("should delete product (delete by ower)", async () => {
     
             const response = await request(app).del("/products/" + dummy_id).set("token",dummy_token)
+            expect(response.body.message).not.toBeDefined()
             expect(response.statusCode).toBe(200)
             expect(response.body.name).toBeDefined()
             expect(response.body.end_date).toBeDefined()
@@ -467,30 +489,20 @@ describe("Test products", () => {
         })
 
         test("should delete product (admin permission)", async () => {
-            //login test user to get token
-            const login = {
-                "login": "Test_Admin",
-                "password": "TestAdmin_P455WORD!"
-            }
-            const admin_token = await getToken(login)
+
+            const admin_token = await getToken(ADMIN_DATA)
     
-            const response = await request(app).del("/products/" + dummy_id).set("token",admin_token)
+            const response = await request(app).del("/products/" + dummy_id).set("token", admin_token)
+            expect(response.body.message).not.toBeDefined()
             expect(response.statusCode).toBe(200)
             expect(response.body.name).toBeDefined()
             expect(response.body.end_date).toBeDefined()
             expect(response.body.cost).toBeDefined()
         })
 
-        // NOTE: It work itself but not with rest? (when is lest than 0 ????)
         test("should fail (product dont exist)", async () => {
-            //login test user to get token
-            const login = {
-                "login": "Test_Admin",
-                "password": "TestAdmin_P455WORD!"
-            }
-            const admin_token = await getToken(login)
     
-            const response = await request(app).del("/products/100").set("token",admin_token)
+            const response = await request(app).del("/products/100").set("token", dummy_token)
             expect(response.statusCode).toBe(400)
             expect(response.body.message).toBeDefined()
         })
