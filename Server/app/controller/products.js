@@ -57,18 +57,21 @@ const getById = (req, res, next) => {
                             if (+left == 0) {
                                 foundProduct.end_saving = true
                                 Product.saved(id)
-                            }
-
-                            if (full) {
-                                foundProduct.payments = payments || []
-                            }
-
-                            return res.send(foundProduct)
+                            }                           
 
                         } catch (error) {
                             return res.status(500).send(errorMessage("Failed to calculate payments"))
                         }
+                    }else{
+                        foundProduct.left = "0.00"
+                        foundProduct.daily = "0.00"
                     }
+
+                    if (full) {
+                        foundProduct.payments = payments || []
+                    }
+
+                    return res.send(foundProduct)
                 })
                 .catch(err => {
                     return res.status(500).send(errorMessage("Failed to get payments from database"))
@@ -134,7 +137,11 @@ const userProducts = (req, res, next) => {
                             } catch (error) {
                                 throw errorMessage("Failed to calculate payments")
                             }
+                        }else{
+                            product.left = "0.00"
+                            product.daily = "0.00"
                         }
+                        
                         return product
                     })
                     .catch(err => {

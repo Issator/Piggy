@@ -77,16 +77,22 @@ export default function ProductCard(props){
                     <BiCalendar/> : {props.end_date}
                 </p>
 
-                <div className='form-group my-2'>
-                    <label htmlFor="amount">Odłóż kwotę</label>
-                    <input type="number" 
-                           className={`form-control ${!isValid && "is-invalid"}`} 
-                           id="amount" 
-                           value={amount} 
-                           onChange={changeAmount}/>
+                {
+                    !props.end_saving && (
+                        <>
+                            <div className='form-group my-2'>
+                                <label htmlFor="amount">Odłóż kwotę</label>
+                                <input type="number" 
+                                    className={`form-control ${!isValid && "is-invalid"}`} 
+                                    id="amount" 
+                                    value={amount} 
+                                    onChange={changeAmount}/>
+                            </div>
+                            <button className="btn btn-primary" type="button" disabled={!isValid} onClick={submitPayment}>Odłóż</button>
+                        </>
+                        )
+                    }
                 </div>
-                <button className="btn btn-primary" type="button" disabled={!isValid} onClick={submitPayment}>Odłóż</button>
-            </div>
             {showModal && <ProductsDetailsModal onClose={() => {setShowModal(false)}} id={props.id} change={handleChange}/>}
         </Card>
     )

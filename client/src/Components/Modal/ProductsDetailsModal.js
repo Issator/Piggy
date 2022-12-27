@@ -5,8 +5,7 @@ import Modal from "./Modal";
 import price from "../../Functions/Price"
 import UpdateProductForm from "../Forms/UpdateProductFrom";
 import ServerError from "../../Servers/serverError";
-
-//FIXME: first payment date always N/A. WHY?
+import toDateString from "../../Functions/ToDateString";
 
 /**
  * return for receiving validation result
@@ -48,11 +47,11 @@ export default function ProductsDetailsModal({onClose,id,change}){
         return (
             <div className="border border-2 rounded-1" style={{height: '200px', overflowY: "auto"}}>  
             {
-                payments.map(payment => {
+                payments.map((payment, index) => {
                 return (
-                    <div key={payment.id} className="p-1">
-                        <p className="p-0 m-0 fw-bold">Numer: {payment.id}</p>
-                        <p className="p-0 m-0">Data: {payment.date ? new Date(payment.date).toLocaleDateString() : "N/A"}</p>
+                    <div key={payment._id} className="p-1">
+                        <p className="p-0 m-0 fw-bold">Numer: {index + 1}</p>
+                        <p className="p-0 m-0">Data: {payment.pay_date ? toDateString(payment.pay_date) : "N/A"}</p>
                         <p className="p-0 m-0">kwota: {price(payment.amount)}</p>
                     </div>
                 )

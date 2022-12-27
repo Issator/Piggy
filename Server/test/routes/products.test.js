@@ -285,7 +285,7 @@ describe("Test products", () => {
             expect(prodResponse.body.end_date).toBeDefined()
             expect(+prodResponse.body.left).toBe(0)
             expect(+prodResponse.body.daily).toBe(0)
-            expect(prodResponse.body.end_savings).toBeTruthy()
+            expect(prodResponse.body.end_saving).toBeTruthy()
         })
     })
 

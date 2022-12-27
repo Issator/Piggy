@@ -39,10 +39,10 @@ export function UserProvider(props) {
     const loginUser = (login,password) => {
         return userServer.signIn({login,password})
                          .then(response => {
-                            const {id,token} = response.data
-                            getUserData(id).then(userDetails => {
+                            const {_id,token} = response.data
+                            getUserData(_id).then(userDetails => {
                                 const toSave = {...userDetails, token}
-                                localStorage.setItem("tokenData", JSON.stringify({id,token}))
+                                localStorage.setItem("tokenData", JSON.stringify({id: _id,token}))
                                 setUserData(toSave)
                                 return null
                             }).catch(err => {throw err})

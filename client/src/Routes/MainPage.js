@@ -35,7 +35,7 @@ export default function MainPage(){
                             const data = response.data
                             // find and replace
                             const allProducts = [...products]
-                            const foundIdx = allProducts.findIndex(product => product.id == response.data.id)
+                            const foundIdx = allProducts.findIndex(product => product._id == response.data._id)
                             if(foundIdx != -1){
                                 allProducts[foundIdx] = data
                                 setProducts(allProducts)
@@ -48,7 +48,7 @@ export default function MainPage(){
 
         if(status == "DELETE"){
             const allProducts = [...products]
-            const foundIdx = allProducts.findIndex(product => product.id == id)
+            const foundIdx = allProducts.findIndex(product => product._id == id)
             if(foundIdx != -1){
                 allProducts.splice(foundIdx, 1)
                 setProducts(allProducts)
@@ -60,14 +60,20 @@ export default function MainPage(){
 
     const mapProducts = () => {
         const generate = (data) => {
+
+            if(data.end_saving){
+                return null
+            }
+            
             return (
                 <ProductCard name={data.name} 
                              cost={data.cost} 
                              end_date={data.end_date}
                              left={data.left}
                              daily={data.daily}
-                             key={data.id}
-                             id={data.id}
+                             key={data._id}
+                             id={data._id}
+                             end_saving={data.end_saving}
                              reload={reloadProduct}
                              />
             )
