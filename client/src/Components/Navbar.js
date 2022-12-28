@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import UserContext from "../Context/User";
 import Dropdown from "./Dropdown";
 
@@ -8,6 +8,7 @@ const HIDE_ON_PAGE = ["/signup", "/signin", "/resetPassword", "/testArea"]
 
 export default function Navbar(){
     const userCtx = useContext(UserContext)
+    const navigate = useNavigate()
 
     // Hide navbar if route in HIDE_ON_PAGE 
     const location = useLocation()
@@ -20,18 +21,21 @@ export default function Navbar(){
         userCtx.logout()
     }
 
+    const gotoHistory = () => {
+        navigate("history")
+    }
+
     return (
         <nav className="row position-sticky top-0 bg-white border border-3 rounded-4 border-primary p-2 m-1" style={{zIndex: "100"}}>
             <div className="d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center">
+                <Link to={"/"} className="d-flex align-items-center text-black text-decoration-none">
                     <img src="piggy.png" style={{width: '50px', height: 'auto'}}/>
                     <h3 className="ms-2">Piggy</h3>
+                </Link>
+                <div>
+                    <button type="button" className="btn btn-outline-primary rounded-4 me-2" onClick={gotoHistory}>Historia</button>
+                    <button type="button" className="btn btn-primary rounded-4" onClick={logoutButton}>Wyloguj się</button>
                 </div>
-                <Dropdown text={userCtx.data.login} id="accountDropdown" className="btn btn-outline-primary border border-white rounded-4">
-                    <div className="dropdown-item pe-pointer">Produkty</div>
-                    <div className="dropdown-item pe-pointer">Ustawienia konta</div>
-                    <div className="dropdown-item pe-pointer" onClick={logoutButton}>Wyloguj się</div>
-                </Dropdown>
             </div>
         </nav>
     )

@@ -1,13 +1,10 @@
-import ProductCard from "../Components/Cards/ProductCard"
-import NewProductCard from "../Components/Cards/NewProductCard"
 import { useContext, useEffect, useState } from "react"
-import productServer from "../Servers/productServer"
+import ProductCard from "../Components/Cards/ProductCard"
 import UserContext from "../Context/User"
-import NewProductModal from "../Components/Modal/NewProductModal"
+import productServer from "../Servers/productServer"
 
-export default function MainPage(){
+export default function ProductsHistory(){
     const [products, setProducts] = useState([])
-    const [showModal, setShowModal] = useState(false)
     const userCtx = useContext(UserContext)
 
     useEffect(() => {
@@ -19,33 +16,7 @@ export default function MainPage(){
         }
     }, [userCtx])
 
-    const refresh = () => {
-        const data = {...userCtx.data}
-        if(data.id && data.token){
-            productServer.getUsersProducts(data.id,data.token)
-                         .then(response => setProducts(response.data))
-                         .catch(error => console.error(error.response))
-        }
-    }
-
     const reloadProduct = (id,status) => {
-        if(status == "UPDATE"){
-            productServer.getById(id, userCtx.data.token)
-                         .then(response => {
-                            const data = response.data
-                            // find and replace
-                            const allProducts = [...products]
-                            const foundIdx = allProducts.findIndex(product => product._id == response.data._id)
-                            if(foundIdx != -1){
-                                allProducts[foundIdx] = data
-                                setProducts(allProducts)
-                            }else{
-                                console.log("Failed to update product:" + id)
-                            }
-                         })
-                         .catch(error => console.error(error.response))
-        }
-
         if(status == "DELETE"){
             const allProducts = [...products]
             const foundIdx = allProducts.findIndex(product => product._id == id)
@@ -74,7 +45,7 @@ export default function MainPage(){
                              key={data._id}
                              id={data._id}
                              end_saving={data.end_saving}
-                             view_mode={data.end_saving}
+                             view_mode={true}
                              reload={reloadProduct}
                              />
             )
@@ -83,13 +54,11 @@ export default function MainPage(){
         return products.map(product => {return generate(product)})
     }
 
-
-    return (
+    return(
         <div className="row p-0 m-0 justify-content-center">
+            <h3 className="text-center">Historia produktów</h3>
             <div className="row m-0 p-0">
                 {mapProducts()}
-                <NewProductCard onClick={() => setShowModal(true)}/>
-                {showModal && <NewProductModal onClose={() => {setShowModal(false)}} refresh={refresh}/>}
             </div>
         </div>
     )

@@ -6,6 +6,7 @@ import "./styles.css"
 import SignUpPage from "./Routes/SignUpPage";
 import { useContext } from "react";
 import UserContext from "./Context/User";
+import ProductsHistory from "./Routes/ProductsHistory";
 
 function App() {
   const isLogged = useContext(UserContext).isLogged
@@ -13,9 +14,10 @@ function App() {
     <BrowserRouter>
       <Navbar/>
       <Routes>
-        <Route path="/"       element={isLogged ? <MainPage/> : <Navigate to={"/signin"}/> }/>
-        <Route path="/signin" element={!isLogged ? <SignInPage/> : <Navigate to={"/"}/> }/>
-        <Route path="/signup" element={!isLogged ? <SignUpPage/> : <Navigate to={"/"}/> }/>
+        <Route path="/"        element={isLogged ? <MainPage/> : <Navigate to={"/signin"}/> }/>
+        <Route path="/signin"  element={!isLogged ? <SignInPage/> : <Navigate to={"/"}/> }/>
+        <Route path="/signup"  element={!isLogged ? <SignUpPage/> : <Navigate to={"/"}/> }/>
+        <Route path="/history" element={isLogged ? <ProductsHistory/> : <Navigate to={"/"}/> }/>
       </Routes>
     </BrowserRouter>
   );

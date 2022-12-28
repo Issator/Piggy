@@ -78,7 +78,7 @@ export default function ProductCard(props){
                 </p>
 
                 {
-                    !props.end_saving && (
+                    !props.view_mode && (
                         <>
                             <div className='form-group my-2'>
                                 <label htmlFor="amount">Odłóż kwotę</label>
@@ -93,7 +93,7 @@ export default function ProductCard(props){
                         )
                     }
                 </div>
-            {showModal && <ProductsDetailsModal onClose={() => {setShowModal(false)}} id={props.id} change={handleChange}/>}
+            {showModal && <ProductsDetailsModal onClose={() => {setShowModal(false)}} id={props.id} change={handleChange} view_mode={props.view_mode}/>}
         </Card>
     )
 }

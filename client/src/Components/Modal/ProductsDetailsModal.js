@@ -17,11 +17,12 @@ import toDateString from "../../Functions/ToDateString";
  * Modal for product details
  *
  * @param {Object}   props 
- * @param {Function} props.onClose - on modal close function
- * @param {number}   props.id      - product id
- * @param {OnChange} props.change  - change product
+ * @param {Function} props.onClose   - on modal close function
+ * @param {number}   props.id        - product id
+ * @param {OnChange} props.change    - change product
+ * @param {boolean}  props.view_mode - show modal in view mode
  */
-export default function ProductsDetailsModal({onClose,id,change}){
+export default function ProductsDetailsModal({onClose,id,change,view_mode}){
     const userCtx = useContext(UserContext)
     const [product, setProduct] = useState({})
     const [editMode, setEditMode] = useState(false)
@@ -123,11 +124,14 @@ export default function ProductsDetailsModal({onClose,id,change}){
                     {paymentList()}
                     <hr/>
                     <div className="d-flex justify-content-between">
-                        <button type="button" 
-                                className="btn btn-secondary-dark" 
-                                style={{width: '120px'}}
-                                onClick={editButtonPressed}
-                        >Edytuj</button>
+                        {
+                            !view_mode && 
+                            <button type="button" 
+                                    className="btn btn-secondary-dark" 
+                                    style={{width: '120px'}}
+                                    onClick={editButtonPressed}
+                            >Edytuj</button>
+                        }
 
                         <button type="button" 
                                 className="btn btn-danger" 
