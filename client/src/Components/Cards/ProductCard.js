@@ -59,39 +59,54 @@ export default function ProductCard(props){
         }
     }
 
+    const bottomCard = () => {
+        if(!props.view_mode){
+            return (
+                <>
+                    <div className='form-group my-2'>
+                        <label htmlFor="amount">Odłóż kwotę</label>
+                        <input type="number" 
+                            className={`form-control ${!isValid && "is-invalid"}`} 
+                            id="amount" 
+                            value={amount} 
+                            onChange={changeAmount}/>
+                    </div>
+                    <button className="btn btn-primary" type="button" disabled={!isValid} onClick={submitPayment}>Odłóż</button>
+                </>
+            )
+        }else{
+            const color = props.end_saving ? "alert-success" : "alert-primary"
+            const text = props.end_saving ? "Zakończone" : "W trakcie"
+            return (
+                <div className={'text-center alert ' + color }>{text}</div>
+            )
+        }
+    }
+
     return (
         <Card>
-            <div className="card-body">
+            <div className="card-body d-flex flex-column">
+                <div className="mb-auto">
+                    <h3 className="pe-pointer clamp-2 m-0 text-primary pe-pointer" onClick={() => setShowModal(true)}>{props.name}</h3>
 
-                <h3 className="pe-pointer clamp-2 m-0 text-primary pe-pointer" onClick={() => setShowModal(true)}>{props.name}</h3>
+                    <p className='m-0' title='Kwota'>
+                        <BiCoinStack/> : {price(props.cost)}
+                    </p>
 
-                <p className='m-0' title='Kwota'>
-                    <BiCoinStack/> : {price(props.cost)}
-                </p>
+                    <p className='m-0' title='Pozostało'>
+                        <BiCoin/> : {price(props.left)}
+                    </p>
 
-                <p className='m-0' title='Pozostało'>
-                    <BiCoin/> : {price(props.left)}
-                </p>
+                    <p className="m-0" title="data zakupu">
+                        <BiCalendar/> : {props.end_date}
+                    </p>
 
-                <p className="m-0" title="data zakupu">
-                    <BiCalendar/> : {props.end_date}
-                </p>
+                </div>
 
-                {
-                    !props.view_mode && (
-                        <>
-                            <div className='form-group my-2'>
-                                <label htmlFor="amount">Odłóż kwotę</label>
-                                <input type="number" 
-                                    className={`form-control ${!isValid && "is-invalid"}`} 
-                                    id="amount" 
-                                    value={amount} 
-                                    onChange={changeAmount}/>
-                            </div>
-                            <button className="btn btn-primary" type="button" disabled={!isValid} onClick={submitPayment}>Odłóż</button>
-                        </>
-                        )
-                    }
+
+                <div>
+                    {bottomCard()}
+                </div>
                 </div>
             {showModal && <ProductsDetailsModal onClose={() => {setShowModal(false)}} id={props.id} change={handleChange} view_mode={props.view_mode}/>}
         </Card>

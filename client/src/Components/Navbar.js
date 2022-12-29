@@ -22,7 +22,11 @@ export default function Navbar(){
     }
 
     const gotoHistory = () => {
-        navigate("history")
+        navigate("/history")
+    }
+
+    const gotoAccount = () => {
+        navigate("/account")
     }
 
     return (
@@ -33,6 +37,7 @@ export default function Navbar(){
                     <h3 className="ms-2">Piggy</h3>
                 </Link>
                 <div>
+                    <button type="button" className="btn btn-outline-primary rounded-4 me-2" onClick={gotoAccount}>Konto</button>
                     <button type="button" className="btn btn-outline-primary rounded-4 me-2" onClick={gotoHistory}>Historia</button>
                     <button type="button" className="btn btn-primary rounded-4" onClick={logoutButton}>Wyloguj się</button>
                 </div>

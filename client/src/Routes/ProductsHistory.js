@@ -31,10 +31,6 @@ export default function ProductsHistory(){
 
     const mapProducts = () => {
         const generate = (data) => {
-
-            if(data.end_saving){
-                return null
-            }
             
             return (
                 <ProductCard name={data.name} 
