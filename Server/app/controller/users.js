@@ -177,19 +177,29 @@ const update = (req, res, next) => {
                            if(!user){
                                return res.status(400).send(errorMessage("User not found!"))
                            }
-                       
-                           const newData = {...user, _id: id, ...{login, password}}
-                           const updatedUser = User.create(newData)
-                       
-                           updatedUser.save()
-                                      .then(response => {
-                                           const toSend = {...newData}
-                                           delete toSend.password
-                                           return res.status(200).send(toSend)
-                                      }) 
-                                      .catch(err => {
-                                           return res.status(500).send(errorMessage("Fail to update user!"))
-                                      })
+
+                           // is login reserved
+                           User.getAll({login: login})
+                               .then(users => {
+                                    if(users[0]._id != id){
+                                        return res.status(400).send(errorMessage("Login exist!"))
+                                    }
+                                    const newData = {...user, _id: id, ...{login, password}}
+                                    const updatedUser = User.create(newData)
+                                
+                                    updatedUser.save()
+                                               .then(response => {
+                                                    const toSend = {...newData}
+                                                    delete toSend.password
+                                                    return res.status(200).send(toSend)
+                                               }) 
+                                               .catch(err => {
+                                                    return res.status(500).send(errorMessage("Fail to update user!"))
+                                               })
+                               })
+                               .catch(err => {
+                                    return res.status(500).send(errorMessage("Fail to get user to update!"))
+                            })
                                
                        })
                        .catch(err => {
