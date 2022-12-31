@@ -4,10 +4,12 @@ import { useContext, useEffect, useState } from "react"
 import productServer from "../Servers/productServer"
 import UserContext from "../Context/User"
 import NewProductModal from "../Components/Modal/NewProductModal"
+import Spinner from "../Components/Utils/Spinner"
 
 export default function MainPage(){
     const [products, setProducts] = useState([])
     const [showModal, setShowModal] = useState(false)
+    const [loading, setLoading] = useState(true)
     const userCtx = useContext(UserContext)
 
     useEffect(() => {
@@ -16,15 +18,18 @@ export default function MainPage(){
             productServer.getUsersProducts(data.id,data.token)
                          .then(response => setProducts(response.data))
                          .catch(error => console.error(error.response))
+                         .finally(setLoading(false))
         }
     }, [userCtx])
 
     const refresh = () => {
+        setLoading(true)
         const data = {...userCtx.data}
         if(data.id && data.token){
             productServer.getUsersProducts(data.id,data.token)
                          .then(response => setProducts(response.data))
                          .catch(error => console.error(error.response))
+                         .finally(setLoading(false))
         }
     }
 
@@ -90,6 +95,7 @@ export default function MainPage(){
                 {mapProducts()}
                 <NewProductCard onClick={() => setShowModal(true)}/>
                 {showModal && <NewProductModal onClose={() => {setShowModal(false)}} refresh={refresh}/>}
+                {loading && <Spinner className="full-center" color="primary" style={{width: "4rem", height: "4rem", borderWidth: "0.5rem"}}/>}
             </div>
         </div>
     )
