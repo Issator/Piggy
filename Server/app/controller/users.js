@@ -6,6 +6,29 @@ const User = require('../models/User')
 const { ObjectId } = require('mongodb')
 
 /**
+ * Get all users
+ * @param {Request}      req  - request
+ * @param {Response}     res  - response
+ * @param {NextFunction} next - next function
+ */
+const getAll = (req, res, next) => {
+    return User.getAll()
+               .then(users => {
+                    const toSend = [...users]
+                    toSend.forEach(user => {
+                        if(user.password){
+                            delete user.password
+                        }
+                    })
+
+                    return res.send(users)
+                })
+               .catch(err => {
+                    return res.status(500).send(errorMessage("Fail to receive users from database!"))
+                })
+}
+
+/**
  * Get user by id
  * @param {Request}      req  - request
  * @param {Response}     res  - response
@@ -264,6 +287,7 @@ const remove = (req, res, next) => {
 }
 
 module.exports = {
+    getAll,
     getById,
     signIn,
     signUp,

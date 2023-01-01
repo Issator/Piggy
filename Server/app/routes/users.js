@@ -7,6 +7,8 @@ router.post('/signin', users.signIn)
 
 router.post('/signup', users.signUp)
 
+router.get('/', users.getAll)
+
 router.get('/:id', users.getById)
 
 router.put('/:id',ValidateToken, users.update)

@@ -154,6 +154,22 @@ describe("Test users", () => {
             expect(response.body.message).toBeDefined()
         })
     })
+    //TODO: add to swagger
+    describe("GET /users", () => {
+
+        test("should return all users", async () => {
+            const response = await request(app).get("/users")
+            expect(response.statusCode).toBe(200)
+            if(response.body.length > 0){
+                response.body.forEach(element => {  
+                    expect(element._id).toBeDefined()
+                    expect(element.login).toBeDefined()
+                    expect(element.status).toBeDefined()
+                })
+            }
+        })
+
+    })
     
     describe("GET /users/:id", () => {
 

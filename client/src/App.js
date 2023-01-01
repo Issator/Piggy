@@ -8,6 +8,7 @@ import { useContext } from "react";
 import UserContext from "./Context/User";
 import ProductsHistory from "./Routes/ProductsHistory";
 import UserPage from "./Routes/UserPage";
+import AdminPage from "./Routes/AdminPage";
 
 function App() {
   const {isLogged, data} = useContext(UserContext)
@@ -21,6 +22,7 @@ function App() {
         <Route path="/signup"  element={!isLogged ? <SignUpPage/> : <Navigate to={"/"}/> }/>
         <Route path="/history" element={isLogged ? <ProductsHistory/> : <Navigate to={"/"}/> }/>
         <Route path="/account" element={isLogged ? <UserPage id={data.id}/> : <Navigate to={"/"}/> }/>
+        <Route path="/admin"   element={isLogged ? <AdminPage/> : <Navigate to={"/"}/>} />
       </Routes>
     </BrowserRouter>
   );

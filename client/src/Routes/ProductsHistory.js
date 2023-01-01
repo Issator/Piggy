@@ -1,11 +1,13 @@
 import { useContext, useEffect, useState } from "react"
 import ProductCard from "../Components/Cards/ProductCard"
+import MainSpinner from "../Components/Utils/MainSpinner"
 import UserContext from "../Context/User"
 import productServer from "../Servers/productServer"
 
 export default function ProductsHistory(){
     const [products, setProducts] = useState([])
     const userCtx = useContext(UserContext)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const data = {...userCtx.data}
@@ -13,6 +15,7 @@ export default function ProductsHistory(){
             productServer.getUsersProducts(data.id,data.token)
                          .then(response => setProducts(response.data))
                          .catch(error => console.error(error.response))
+                         .finally(() => setLoading(false))
         }
     }, [userCtx])
 
@@ -56,6 +59,7 @@ export default function ProductsHistory(){
             <div className="row m-0 p-0">
                 {mapProducts()}
             </div>
+            {loading && <MainSpinner/>}
         </div>
     )
 }

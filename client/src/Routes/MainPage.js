@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react"
 import productServer from "../Servers/productServer"
 import UserContext from "../Context/User"
 import NewProductModal from "../Components/Modal/NewProductModal"
-import Spinner from "../Components/Utils/Spinner"
+import MainSpinner from "../Components/Utils/MainSpinner"
 
 export default function MainPage(){
     const [products, setProducts] = useState([])
@@ -18,7 +18,7 @@ export default function MainPage(){
             productServer.getUsersProducts(data.id,data.token)
                          .then(response => setProducts(response.data))
                          .catch(error => console.error(error.response))
-                         .finally(setLoading(false))
+                         .finally(() => setLoading(false))
         }
     }, [userCtx])
 
@@ -29,7 +29,7 @@ export default function MainPage(){
             productServer.getUsersProducts(data.id,data.token)
                          .then(response => setProducts(response.data))
                          .catch(error => console.error(error.response))
-                         .finally(setLoading(false))
+                         .finally(() => setLoading(false))
         }
     }
 
@@ -95,7 +95,7 @@ export default function MainPage(){
                 {mapProducts()}
                 <NewProductCard onClick={() => setShowModal(true)}/>
                 {showModal && <NewProductModal onClose={() => {setShowModal(false)}} refresh={refresh}/>}
-                {loading && <Spinner className="full-center" color="primary" style={{width: "4rem", height: "4rem", borderWidth: "0.5rem"}}/>}
+                {loading && <MainSpinner/>}
             </div>
         </div>
     )

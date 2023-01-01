@@ -3,6 +3,15 @@ import { AxiosResponse } from "axios";
 import SERVER from "./serverConfig";
 
 /**
+ * Get all users
+ *
+ * @returns {Promise<AxiosResponse<any,any>>} server response
+ */
+const getAll = () => {
+    return axios.get(SERVER + "/users" )
+}
+
+/**
  * Get user data by id
  *
  * @param {number|string} id user id
@@ -68,6 +77,7 @@ const remove = (id, password, token) => {
 }
 
 const userServer = {
+    getAll,
     getById,
     signIn,
     signUp,
