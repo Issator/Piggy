@@ -4,15 +4,16 @@ import MainSpinner from "../Components/Utils/MainSpinner"
 import UserContext from "../Context/User"
 import productServer from "../Servers/productServer"
 
-export default function ProductsHistory(){
+export default function ProductsHistory({user_id}){
     const [products, setProducts] = useState([])
     const userCtx = useContext(UserContext)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const data = {...userCtx.data}
-        if(data.id && data.token){
-            productServer.getUsersProducts(data.id,data.token)
+        const gotId = user_id || data.id
+        if(gotId && data.token){
+            productServer.getUsersProducts(gotId,data.token)
                          .then(response => setProducts(response.data))
                          .catch(error => console.error(error.response))
                          .finally(() => setLoading(false))
@@ -48,6 +49,10 @@ export default function ProductsHistory(){
                              reload={reloadProduct}
                              />
             )
+        }
+
+        if(products.length == 0){
+            return <h5 className=" text-center">Brak produktów</h5>
         }
 
         return products.map(product => {return generate(product)})
