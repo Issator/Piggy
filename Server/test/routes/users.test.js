@@ -282,7 +282,7 @@ describe("Test users", () => {
     
             // change value
             const req = {
-                login: "NEW_Login"
+                login: "NEW_Login_02"
             }
     
             // login admin

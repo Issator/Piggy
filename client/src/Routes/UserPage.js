@@ -4,6 +4,13 @@ import UserContext from "../Context/User"
 import MainSpinner from "../Components/Utils/MainSpinner"
 import DeleteAccount from "../Components/Forms/DeleteAccount"
 
+/**
+ * Page for showing user data
+ *
+ * @param {Object} props
+ * @param {string} props.id user id
+ * @param {Function} props.onDelete on delete vent handler [optional]
+ */
 export default function UserPage({ id: user_id, onDelete }) {
     const userCtx = useContext(UserContext)
     const [userData, setUserData] = useState({})
@@ -48,6 +55,10 @@ export default function UserPage({ id: user_id, onDelete }) {
         setShowDelete(true)
     }
 
+    /**
+     * Function activated if user was deleted successfully
+     * @param {string} user_id user id
+     */
     const AccountDeletedHandler = (user_id) => {
         if(onDelete){
             onDelete(user_id)

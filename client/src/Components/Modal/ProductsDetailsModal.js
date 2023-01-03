@@ -35,10 +35,16 @@ export default function ProductsDetailsModal({onClose,id,change,view_mode}){
                      .catch(err => console.log(err))
     }, [])
 
+    /**
+     * Send delete message
+     */ 
     const deleteProduct = () => {
         change("DELETE")
     }
 
+    /**
+     * Generate payment list
+     */
     const paymentList = () => {
         const {payments} = product
         if (!payments || payments.length == 0){
@@ -62,6 +68,9 @@ export default function ProductsDetailsModal({onClose,id,change,view_mode}){
         )
     }
 
+    /**
+     * Function for editing product on button pressed
+     */
     const editButtonPressed = () => {
         if(!editMode){
             setEditMode(true)
@@ -83,10 +92,17 @@ export default function ProductsDetailsModal({onClose,id,change,view_mode}){
         }
     }
 
+    /**
+     * handle product data change
+     * @param {JSON} data 
+     */
     const handleEditChange = (data) => {
         setEditValue(data)
     }
 
+    /**
+     * Show details of product
+     */
     const details = () => {
         // show edit mode or data
         if(editMode){

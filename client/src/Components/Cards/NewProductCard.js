@@ -1,5 +1,11 @@
 import Card from "./Card";
 
+/**
+ * Card for creating new product
+ *
+ * @param {Object} props
+ * @param {Function} props.onClick on card click function
+ */
 export default function NewProductCard({onClick}){
     return (
         <Card className="border-dark bg-dark text-white p-0">         

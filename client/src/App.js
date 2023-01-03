@@ -21,7 +21,7 @@ function App() {
         <Route path="/signin"  element={!isLogged ? <SignInPage/> : <Navigate to={"/"}/> }/>
         <Route path="/signup"  element={!isLogged ? <SignUpPage/> : <Navigate to={"/"}/> }/>
         <Route path="/history" element={isLogged ? <ProductsHistory/> : <Navigate to={"/"}/> }/>
-        <Route path="/account" element={isLogged ? <UserPage id={data.id}/> : <Navigate to={"/"}/> }/>
+        <Route path="/account" element={isLogged ? <UserPage id={data._id}/> : <Navigate to={"/"}/> }/>
         <Route path="/admin"   element={isLogged ? <AdminPage/> : <Navigate to={"/"}/>} />
       </Routes>
     </BrowserRouter>

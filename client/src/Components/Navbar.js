@@ -6,6 +6,9 @@ import Dropdown from "./Dropdown";
 /** on with routes navbar should be hidden */
 const HIDE_ON_PAGE = ["/signup", "/signin", "/resetPassword", "/testArea"]
 
+/**
+ * Navigation showed on top of screen
+ */
 export default function Navbar(){
     const userCtx = useContext(UserContext)
     const navigate = useNavigate()

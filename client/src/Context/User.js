@@ -3,7 +3,7 @@ import userServer from "../Servers/userServer"
 
 const UserContext = createContext({
     data: {
-        id: 0,
+        _id: 0,
         login: "",
         email: "",
         token: "",
@@ -42,7 +42,7 @@ export function UserProvider(props) {
                             const {_id,token} = response.data
                             getUserData(_id).then(userDetails => {
                                 const toSave = {...userDetails, token}
-                                localStorage.setItem("tokenData", JSON.stringify({id: _id,token}))
+                                localStorage.setItem("tokenData", JSON.stringify({_id: _id,token}))
                                 setUserData(toSave)
                                 return null
                             }).catch(err => {throw err})
@@ -57,8 +57,8 @@ export function UserProvider(props) {
 
     const loadData = () => {
         const tokenData = JSON.parse(localStorage.getItem("tokenData"))
-        if(tokenData && tokenData.id && tokenData.token){
-            getUserData(tokenData.id).then(userData => {
+        if(tokenData && tokenData._id && tokenData.token){
+            getUserData(tokenData._id).then(userData => {
                 setUserData({...userData,...tokenData})
             }).catch(err => {
                 throw "Fail to receive data!"

@@ -1,5 +1,13 @@
 import { useEffect } from "react"
 
+/**
+ * from for updating product
+ *
+ * @param {Object}   props
+ * @param {JSON}     props.product  - product data
+ * @param {Function} props.onChange - on form data change
+ * @return {*} 
+ */
 export default function UpdateProductForm({product, onChange}){
 
     useEffect(() => {
@@ -11,6 +19,10 @@ export default function UpdateProductForm({product, onChange}){
         onChange(data)
     }, [])
 
+    /**
+     * handle value change
+     * @param {import("react").ChangeEvent<HTMLFormElement>} e event
+     */
     const changeValue = (e) => {
         const formData = new FormData(e.currentTarget);
         const data = {}

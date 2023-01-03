@@ -255,11 +255,9 @@ const update = (req, res, next) => {
 
             return updatedProduct.save()
                 .then(result => {
-                    console.log(result)
                     return res.status(200).send(updatedProduct.toJSON())
                 })
                 .catch(err => {
-                    console.log(err)
                     return res.status(400).send(errorMessage("Failed update product!"))
                 })
         })
@@ -316,7 +314,6 @@ const remove = (req, res, next) => {
                                 })
                 })
                 .catch(err => {
-                    console.log("DELETE ERROR", err)
                     return res.status(400).send({ message: "Failed to delete product!" })
                 })
         })

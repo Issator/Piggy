@@ -6,6 +6,9 @@ import UserContext from "../Context/User"
 import NewProductModal from "../Components/Modal/NewProductModal"
 import MainSpinner from "../Components/Utils/MainSpinner"
 
+/**
+ * Main page displayed on main root
+ */
 export default function MainPage(){
     const [products, setProducts] = useState([])
     const [showModal, setShowModal] = useState(false)
@@ -14,25 +17,31 @@ export default function MainPage(){
 
     useEffect(() => {
         const data = {...userCtx.data}
-        if(data.id && data.token){
-            productServer.getUsersProducts(data.id,data.token)
+        if(data._id && data.token){
+            productServer.getUsersProducts(data._id,data.token)
                          .then(response => setProducts(response.data))
                          .catch(error => console.error(error.response))
                          .finally(() => setLoading(false))
         }
     }, [userCtx])
 
+    /**
+     * refresh products list
+     */
     const refresh = () => {
         setLoading(true)
         const data = {...userCtx.data}
-        if(data.id && data.token){
-            productServer.getUsersProducts(data.id,data.token)
-                         .then(response => setProducts(response.data))
-                         .catch(error => console.error(error.response))
-                         .finally(() => setLoading(false))
-        }
+        productServer.getUsersProducts(data._id,data.token)
+                     .then(response => setProducts(response.data))
+                     .catch(error => console.error(error.response))
+                     .finally(() => setLoading(false))
     }
 
+    /**
+     * reload product data
+     * @param {string} id
+     * @param {"UPDATE"|"DELETE"} status
+     */
     const reloadProduct = (id,status) => {
         if(status == "UPDATE"){
             productServer.getById(id, userCtx.data.token)
@@ -63,6 +72,9 @@ export default function MainPage(){
         }
     }
 
+    /**
+     * Map products list
+     */
     const mapProducts = () => {
         const generate = (data) => {
 

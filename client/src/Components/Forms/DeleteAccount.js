@@ -7,10 +7,18 @@ export default function DeleteAccount({id,onDelete}){
     const [password, setPassword] = useState("")
     const [alert, setAlert] = useState(null)
 
+    /**
+     * Handle password change
+     * @param {import("react").ChangeEvent<HTMLInputElement>} e event
+     */
     const handleChange = (e) => {
         setPassword(e.target.value)
     }
 
+    /**
+     * on delete form submit
+     * @param {import("react").MouseEvent<HTMLButtonElement>} e event
+     */
     const onSubmit = (e) => {
         e.preventDefault()
 

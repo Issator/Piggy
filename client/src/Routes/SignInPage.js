@@ -2,7 +2,11 @@ import { useContext, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import UserContext from "../Context/User";
 import serverError from "../Servers/serverError"
+import Spinner from "../Components/Utils/Spinner";
 
+/**
+ * Page for sign in users
+ */
 export default function SignInPage() {
 
     const location = useLocation()
@@ -29,6 +33,8 @@ export default function SignInPage() {
 
     const [isLoginValid, setLoginValid] = useState(true)
     const [isPasswordValid, setPasswordValid] = useState(true)
+
+    const [signInLoading, setSignInLoading] = useState(false)
 
     /**
      * Validate login if correct
@@ -85,6 +91,7 @@ export default function SignInPage() {
      * @param {React.ChangeEvent<HTMLButtonElement>} e - Button event
      */
      const handleButtonClick = (e) => {
+        setSignInLoading(true)
         e.preventDefault()
 
         const loginResult = validateLogin(login)
@@ -95,16 +102,13 @@ export default function SignInPage() {
             return
         }
 
-        const toSend = {
-            login,password
-        }
-
         userCtx.login(login, password)
                .catch(err => {
                 const error = serverError(err)
                 if(error){
                     setAlert({message:error, type:"danger"})
                 }
+                setSignInLoading(false)
                })
     }
 
@@ -140,8 +144,9 @@ export default function SignInPage() {
 
                         <div className="form-group p-1">
                             <button className="btn btn-primary w-100"
+                                    disabled={signInLoading}
                                     onClick={handleButtonClick}>
-                                Zaloguj się
+                                {!signInLoading ? "Zaloguj się" : <Spinner color="white"/>}
                             </button>
                         </div>
 

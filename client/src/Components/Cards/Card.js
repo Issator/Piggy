@@ -3,7 +3,7 @@ import { CSSProperties } from "react"
 /**
  * Universal card component
  * @param {Object} props
- * @param {CSSProperties} props.className
+ * @param {CSSProperties} props.className card extra classes
  * @export
  */
 export default function Card(props){

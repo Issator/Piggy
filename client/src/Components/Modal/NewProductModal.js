@@ -21,6 +21,10 @@ export default function({onClose,refresh}){
 
     const [alert, setAlert] = useState("")
 
+    /**
+     * Submit data function
+     * @param {import("react").MouseEvent<HTMLButtonElement>} e event
+     */
     const submitData = (e) => {
         e.preventDefault()
 
@@ -30,13 +34,14 @@ export default function({onClose,refresh}){
             end_date: date
         }
 
+        // validate data
         const err = entryValidation(data)
-
         if(err){
             setAlert(err)
             return
         }
 
+        // send data to server
         productServer.post(data,userCtx.data.token)
                      .then(response => {
                         refresh()
@@ -53,6 +58,11 @@ export default function({onClose,refresh}){
                      })
     }
 
+    /**
+     * verify if data is correct
+     * @param {JSON} data
+     * @return {String} error message or null if data correct 
+     */
     const entryValidation = (data) => {
         if(data.name == ""){
             return "Podaj nazwę produktu!"

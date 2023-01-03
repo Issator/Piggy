@@ -7,6 +7,9 @@ import ProductsHistory from "./ProductsHistory"
 import UserPage from "./UserPage"
 import { FaUser } from "react-icons/fa"
 
+/**
+ * Page for admins only. Used for check user information and changing it
+ */
 export default function AdminPage(){
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
@@ -16,11 +19,17 @@ export default function AdminPage(){
         getUserData()
     }, [])
 
+    /**
+     * Reload user list
+     */
     const reloadList = () => {
         setLoading(true)
         getUserData()
     }
 
+    /**
+     * Get all users from server
+     */
     const getUserData = () => {
         userServer.getAll()
                   .then(response => setUsers(response.data))
@@ -28,6 +37,10 @@ export default function AdminPage(){
                   .finally(() => setLoading(false))
     }
 
+    /**
+     * Remove user from list
+     * @param {string} user_id
+     */
     const userRemovedHandler = (user_id) => {
         const filtered = [...users].filter(user => user._id != user_id)
         setModalContent(null)

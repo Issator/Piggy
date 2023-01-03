@@ -1,6 +1,5 @@
 /**
- * 
- * @export
+ * Simple spinner component
  * @param {Object} props
  * @param {import("react").CSSProperties} props.style
  * @param {import("react").HTMLAttributes<HTMLDivElement>.className} props.className

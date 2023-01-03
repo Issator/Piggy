@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Spinner from "../Components/Utils/Spinner";
 import ServerError from "../Servers/serverError";
 import userServer from "../Servers/userServer";
 
+/**
+ * Page for signup users
+ */
 export default function SignUpPage() {
     const navigate = useNavigate()
 
@@ -15,6 +19,8 @@ export default function SignUpPage() {
     const [isLoginValid, setLoginValid] = useState(true)
     const [isPasswordValid, setPasswordValid] = useState(true)
     const [isEmailValid, setEmailValid] = useState(true)
+
+    const [signUpLoading, setSignUpLoading] = useState(false)
 
     /**
      * Validate login if correct
@@ -87,6 +93,7 @@ export default function SignUpPage() {
      * @param {React.ChangeEvent<HTMLButtonElement>} e - Button event
      */
     const handleButtonClick = (e) => {
+        setSignUpLoading(true)
         e.preventDefault()
 
         const loginResult    = validateLogin(login)
@@ -94,6 +101,7 @@ export default function SignUpPage() {
         const passwordResult = validatePassword(password)
 
         if(!loginResult || !emailResult || !passwordResult){
+            setSignUpLoading(false)
             return
         }
 
@@ -109,6 +117,7 @@ export default function SignUpPage() {
             if(error){
                 setAlert(error)
             }
+            setSignUpLoading(false)
         })
 
     }
@@ -154,8 +163,8 @@ export default function SignUpPage() {
                         </div>
 
                         <div className="form-group p-1">
-                            <button className="btn btn-primary w-100 mt-3" onClick={handleButtonClick}>
-                                Zarejestruj się
+                            <button className="btn btn-primary w-100 mt-3" onClick={handleButtonClick} disabled={signUpLoading}>
+                                {!signUpLoading ? "Zarejestruj się" : <Spinner color="white"/>}
                             </button>
 
                             {alert &&

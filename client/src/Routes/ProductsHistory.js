@@ -4,6 +4,12 @@ import MainSpinner from "../Components/Utils/MainSpinner"
 import UserContext from "../Context/User"
 import productServer from "../Servers/productServer"
 
+/**
+ * Display all user products
+ *
+ * @param {Object} props
+ * @param {string} props.user_id user id
+ */
 export default function ProductsHistory({user_id}){
     const [products, setProducts] = useState([])
     const userCtx = useContext(UserContext)
@@ -11,7 +17,7 @@ export default function ProductsHistory({user_id}){
 
     useEffect(() => {
         const data = {...userCtx.data}
-        const gotId = user_id || data.id
+        const gotId = user_id || data._id
         if(gotId && data.token){
             productServer.getUsersProducts(gotId,data.token)
                          .then(response => setProducts(response.data))
@@ -20,6 +26,12 @@ export default function ProductsHistory({user_id}){
         }
     }, [userCtx])
 
+    /**
+     * function for reloading product
+     *
+     * @param {string} id product id
+     * @param {"DELETE"|"UPDATE"} status request status
+     */
     const reloadProduct = (id,status) => {
         if(status == "DELETE"){
             const allProducts = [...products]
@@ -33,6 +45,9 @@ export default function ProductsHistory({user_id}){
         }
     }
 
+    /**
+     * Map products list
+     */
     const mapProducts = () => {
         const generate = (data) => {
             

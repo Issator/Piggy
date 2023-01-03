@@ -21,6 +21,10 @@ export default function ProductCard(props){
         }
     }, [props])
 
+    /**
+     * Submit payment handler
+     * @param {React.MouseEvent<HTMLButtonElement, MouseEvent>} e event
+     */
     const submitPayment = (e) => {
         e.preventDefault()
 
@@ -30,12 +34,16 @@ export default function ProductCard(props){
         }
 
         props.reload(props.id)
-
         productServer.payment(toSend,userCtx.data.token)
                      .then(response => props.reload(props.id,"UPDATE"))
                      .catch(err => console.log(err.response))
     }
 
+    /**
+     * Change amount handler
+     *
+     * @param {import('react').ChangeEvent<HTMLInputElement>} e event
+     */
     const changeAmount = (e) => {
         const amount = e.target.value
         setAmount(amount)
@@ -48,8 +56,12 @@ export default function ProductCard(props){
         }
     }
 
+    /**
+     * handle change request from modal
+     *
+     * @param {"DELETE"|"UPDATE"} status request status
+     */
     const handleChange = (status) => {
-        //TODO: move to modal?
         if(status == "DELETE"){
             productServer.remove(props.id,userCtx.data.token)
                          .then(response => props.reload(props.id,"DELETE"))
@@ -59,6 +71,9 @@ export default function ProductCard(props){
         }
     }
 
+    /**
+     * display bottom of card
+     */
     const bottomCard = () => {
         if(!props.view_mode){
             return (

@@ -1,3 +1,8 @@
+/**
+ * Unified to date string function
+ * @param {Date|String} date date
+ * @return {string} date 
+ */
 export default function toDateString(date){
     const options = {
             weekday: "long",
