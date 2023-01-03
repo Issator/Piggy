@@ -2,12 +2,14 @@ import { useContext, useEffect, useState } from "react"
 import userServer from "../Servers/userServer"
 import UserContext from "../Context/User"
 import MainSpinner from "../Components/Utils/MainSpinner"
+import DeleteAccount from "../Components/Forms/DeleteAccount"
 
-export default function UserPage({ id: user_id }) {
+export default function UserPage({ id: user_id, onDelete }) {
     const userCtx = useContext(UserContext)
     const [userData, setUserData] = useState({})
     const [alert, setAlert] = useState({ status: null, message: null })
     const [loading, setLoading] = useState(true)
+    const [showDelete, setShowDelete] = useState(false)
 
     useEffect(() => {
         if (user_id) {
@@ -40,8 +42,18 @@ export default function UserPage({ id: user_id }) {
                     console.log(error)
                 }
             })
+    }
 
-        console.log(data)
+    const showDeleteForm = () => {
+        setShowDelete(true)
+    }
+
+    const AccountDeletedHandler = (user_id) => {
+        if(onDelete){
+            onDelete(user_id)
+        }else{
+            userCtx.logout()
+        }
     }
 
     return (
@@ -81,8 +93,11 @@ export default function UserPage({ id: user_id }) {
                                 name="password"
                                 placeholder="Podaj nowe hasło" />
                         </div>
-                        <div className="mt-2">
+                        <div className="mt-2 d-flex justify-content-between">
                             <button type="submit" className="btn btn-primary">Zapisz zmiany</button>
+                            {!showDelete &&
+                                <button type="button" className="btn btn-danger" onClick={showDeleteForm}>Usuń konto</button>
+                            }
                         </div>
 
                         {alert.status && alert.message &&
@@ -91,6 +106,13 @@ export default function UserPage({ id: user_id }) {
                             </div>
                         }
 
+                        {showDelete && (
+                            <div className="mt-2">
+                                <hr/>
+                                <h5>Usuń konto</h5>
+                                <DeleteAccount id={user_id} onDelete={AccountDeletedHandler}/>
+                            </div>
+                        )}
                     </form>
                 </div>
             </div>

@@ -204,7 +204,7 @@ const update = (req, res, next) => {
                            // is login reserved
                            User.getAll({login: login})
                                .then(users => {
-                                    if(users[0]._id != id){
+                                    if(users.length > 0 && users[0]._id != id){
                                         return res.status(400).send(errorMessage("Login exist!"))
                                     }
                                     const newData = {...user, _id: id, ...{login, password}}
@@ -221,7 +221,7 @@ const update = (req, res, next) => {
                                                })
                                })
                                .catch(err => {
-                                    return res.status(500).send(errorMessage("Fail to get user to update!"))
+                                    return res.status(500).send(errorMessage("Fail to search existed user!"))
                             })
                                
                        })

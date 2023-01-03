@@ -73,7 +73,7 @@ const update = (id,userData,token) => {
  * @param {string} token token
  */
 const remove = (id, password, token) => {
-    return axios.delete(SERVER + "/users/" + id, password, {headers: {token: token}})
+    return axios.delete(SERVER + "/users/" + id, {headers: {token: token}, data: {password: password}})
 }
 
 const userServer = {

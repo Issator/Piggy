@@ -16,6 +16,11 @@ export default function AdminPage(){
         getUserData()
     }, [])
 
+    const reloadList = () => {
+        setLoading(true)
+        getUserData()
+    }
+
     const getUserData = () => {
         userServer.getAll()
                   .then(response => setUsers(response.data))
@@ -23,12 +28,18 @@ export default function AdminPage(){
                   .finally(() => setLoading(false))
     }
 
+    const userRemovedHandler = (user_id) => {
+        const filtered = [...users].filter(user => user._id != user_id)
+        setModalContent(null)
+        setUsers(filtered)
+    }
+
     const historyModal = (user) => {
         setModalContent(<ProductsHistory user_id={user._id}/>)
     }
 
     const userModal = (user) => {
-        setModalContent(<UserPage id={user._id}/>)
+        setModalContent(<UserPage id={user._id} onDelete={userRemovedHandler}/>)
     }
 
     const CloseModal = () => {
@@ -57,6 +68,9 @@ export default function AdminPage(){
     return(
         <div className="row p-0 m-0 justify-content-center">
             <h3 className="text-center">Panel administratora</h3>
+            <div className="row w-50">
+                <button className="btn btn-primary" type="button" onClick={reloadList}>Odśwież Listę</button>
+            </div>
             <div style={{maxWidth: "1200px"}}>
                 {users && users.map(user => {
                     return userCard(user)
