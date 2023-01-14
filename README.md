@@ -18,14 +18,36 @@ W odpowiedzi serwer zwróci ile dziennie powinien odkładać i będzie nadzorowa
 
 ## Instalacja
 
-aby zainstalować program należy pobrać repozytorium, a następnie w folderze ``Piggy/Serwer`` uruchomić:
+<b>Uwaga!</b> Do uruchomienia aplikacji wymagany jest nodeJS w wersji 16.14.2. lub nowszej! 
+<br/>
+Aby zainstalować program należy pobrać repozytorium, a następnie w folderze ``Piggy/Serwer`` uruchomić:
 
 ```
 npm install
 ```
 
-następnie aby uruchomić serwer w wersji deweloperskiej należy wpisać:
+Następnie w pliku ``.env/mongo.js`` powinien zostać podany klucz dostępu do bazy danych mongoDB. Aby uruchomić serwer w wersji deweloperskiej należy wpisać do konsoli komendę:
 
 ```
 npm start
 ```
+
+W celu uruchomienia testów jednostkowych dostępna jest komenda:
+```
+npm test
+```
+
+Jeżeli serwer zostanie uruchomiony oraz pomyślnie połączy się z bazą danych zostanie wyświetlony komunikat:
+
+```
+Mongo connected!
+Listening on port 4200
+```
+
+Po poprawnym uruchomieniu serwera można przejść do klienta aplikacji. Należy wejść do folderu ``Piggy/Client`` gdzie, aby zainstalować wymagane moduły a następnie uruchomić program, należy wpisać komendy:
+
+```
+npm install
+npm start
+```
+

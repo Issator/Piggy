@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "login": "Test_User",
+        "password": "TestUser_P455WORD!",
+        "email": "TestUser@piggy.com",
+        "status": "user"
+    },
+    {
+        "id": 2,
+        "login": "Test_Admin",
+        "password": "TestAdmin_P455WORD!",
+        "email": "TestAdmin@piggy.com",
+        "status": "admin"
+    },
+    {
+        "id": 3,
+        "login": "Test_User_02",
+        "password": "TestUser_02_P455WORD!",
+        "email": "TestUser02@piggy.com",
+        "status": "user"
+    },
+    {
+        "id": 4,
+        "login": "test",
+        "password": "test123!A",
+        "email": "test@piggy.com",
+        "status": "user"
+    }
+]

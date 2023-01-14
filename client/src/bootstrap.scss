@@ -1,0 +1,15 @@
+$theme-colors: (
+    "primary": #8b0a63,
+    "secondary": #50e23a,
+    "secondary-dark": #17A802,
+    "success": #2e7814,
+    "warning": #d78723,
+    "danger": #dc3545,
+    "light": #f8f9fa,
+    "dark": #343a40
+);
+
+$min-contrast-ratio: 2.5;
+
+
+@import '~bootstrap/scss/bootstrap.scss';

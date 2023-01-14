@@ -1,1 +1,26 @@
-[]
+[
+    {
+        "id": 1,
+        "name": "New TV",
+        "cost": 2400,
+        "end_date": "2024-12-12",
+        "user_id": 1,
+        "end_savings": false
+    },
+    {
+        "name": "Telewizor",
+        "cost": 500,
+        "end_date": "2023-12-23",
+        "user_id": 4,
+        "id": 2,
+        "end_savings": false
+    },
+    {
+        "name": "Admin Product",
+        "cost": 2500,
+        "end_date": "2024-12-23",
+        "user_id": 2,
+        "id": 3,
+        "end_savings": false
+    }
+]
