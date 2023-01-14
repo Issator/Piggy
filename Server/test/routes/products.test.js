@@ -433,7 +433,6 @@ describe("Test products", () => {
             expect(+response.body.cost).toBe(+req.cost)
         })
     
-        // NOTE: It work itself but not with rest? (when is lest than 0 ????)
         test("should fail (product dont exist)", async () => {   
             // change value
             const req = {

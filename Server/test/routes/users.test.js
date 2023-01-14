@@ -154,7 +154,7 @@ describe("Test users", () => {
             expect(response.body.message).toBeDefined()
         })
     })
-    //TODO: add to swagger
+
     describe("GET /users", () => {
 
         test("should return all users", async () => {
