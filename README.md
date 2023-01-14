@@ -32,7 +32,7 @@ Następnie w pliku ``.env/mongo.js`` powinien zostać podany klucz dostępu do b
 npm start
 ```
 
-W celu uruchomienia testów jednostkowych dostępna jet komenda:
+W celu uruchomienia testów jednostkowych dostępna jest komenda:
 ```
 npm test
 ```
