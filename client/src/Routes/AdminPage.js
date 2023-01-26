@@ -61,7 +61,7 @@ export default function AdminPage(){
 
     const userCard = (user) => {
         return (
-            <div className="card p-1 my-2" key={user._id}>
+            <div className="card p-1 my-2 shadow-sm" key={user._id}>
                 <div className="d-flex justify-content-between">
                     <div>
                         <p className="p-0 m-0"><b>Id:    </b> {user._id}     </p>
@@ -81,10 +81,10 @@ export default function AdminPage(){
     return(
         <div className="row p-0 m-0 justify-content-center">
             <h3 className="text-center">Panel administratora</h3>
-            <div className="row w-50">
+            <div className="row">
                 <button className="btn btn-primary" type="button" onClick={reloadList}>Odśwież Listę</button>
             </div>
-            <div style={{maxWidth: "1200px"}}>
+            <div>
                 {users && users.map(user => {
                     return userCard(user)
                 })}
@@ -92,7 +92,7 @@ export default function AdminPage(){
             {loading && <MainSpinner/>}
             {modalContent && (
                 <Modal onClose={CloseModal}>
-                    <div className="card" style={{width: "32rem", maxHeight: "40rem", overflowY: "scroll"}}>
+                    <div className="card p-2" style={{width: "32rem", minHeight: "20rem", maxHeight: "42rem", overflow: "auto"}}>
                         {modalContent}
                     </div>
                 </Modal>

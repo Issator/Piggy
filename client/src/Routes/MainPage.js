@@ -102,13 +102,11 @@ export default function MainPage(){
 
 
     return (
-        <div className="row p-0 m-0 justify-content-center">
-            <div className="row m-0 p-0">
+        <div className="row">
                 {mapProducts()}
                 <NewProductCard onClick={() => setShowModal(true)}/>
                 {showModal && <NewProductModal onClose={() => {setShowModal(false)}} refresh={refresh}/>}
                 {loading && <MainSpinner/>}
-            </div>
         </div>
     )
 }
