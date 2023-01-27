@@ -67,7 +67,7 @@ export default function ProductsHistory({user_id}){
         }
 
         if(products.length == 0){
-            return <h5 className=" text-center">Brak produktów</h5>
+            return <h5 className="full-center">Brak produktów</h5>
         }
 
         return products.map(product => {return generate(product)})
@@ -77,7 +77,7 @@ export default function ProductsHistory({user_id}){
         <div className="row p-0 m-0 justify-content-center">
             <h3 className="text-center">Historia produktów</h3>
             <div className="row m-0 p-0">
-                {mapProducts()}
+                {!loading && mapProducts()}
             </div>
             {loading && <MainSpinner/>}
         </div>
