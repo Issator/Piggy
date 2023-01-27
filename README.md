@@ -16,6 +16,10 @@ W odpowiedzi serwer zwróci ile dziennie powinien odkładać i będzie nadzorowa
 
 ![Diagram ERD](./Diagram%20ERD.png)
 
+## Diagram Przypadków Użycia
+
+![Diagram Przypadków użycia](./Diagram%20PU.png)
+
 ## Instalacja
 
 <b>Uwaga!</b> Do uruchomienia aplikacji wymagany jest nodeJS w wersji 16.14.2. lub nowszej! 
