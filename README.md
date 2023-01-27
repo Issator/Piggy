@@ -12,9 +12,15 @@ Aby korzystać z aplikacji, użytkownik musi utworzyć konto. Po utworzeniu kont
 
 W odpowiedzi serwer zwróci ile dziennie powinien odkładać i będzie nadzorował czy kwota ta jest odkładana. Dzienna rata może zmieniać się w zależności od odkładanej kwoty. Jeżeli użytkownik pewnego dnia odłoży mniejszą kwotę niż jest wymagana, liczba do odłożenia w następne dni powiększy się. Jeżeli użytkownik odda więcej niż dzienna wartość raty, będzie odkładać mniej w kolejnych dniach. Użytkownik będzie mógł oszczędzać na wiele produktów naraz, a także przeglądać historie swoich zakupów.
 
+ - Opis ścieżek: https://app.swaggerhub.com/apis-docs/pwsz_tarnow/Piggy/1.0.0
+
 ## Diagram ERD Bazy danych
 
 ![Diagram ERD](./Diagram%20ERD.png)
+
+## Diagram Przypadków Użycia
+
+![Diagram Przypadków użycia](./Diagram%20PU.png)
 
 ## Instalacja
 

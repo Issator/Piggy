@@ -8,7 +8,7 @@ import { CSSProperties } from "react"
  */
 export default function Card(props){
     return (
-        <div className={"card border border-3 m-2 " + props.className}  
+        <div className={"card shadow-sm border border-3 m-2 " + props.className}  
                 style={{width: '14rem', height: '18rem'}}
         >
             {props.children}

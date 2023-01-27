@@ -21,7 +21,17 @@ const Background = (props) => {
 const ModalOverlay = (props) => {
     return (
         <div className={classes["modal-main"]}>
-            <div>{props.children}</div>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn-close bg-light p-2 rounded rounded-4 mb-1" data-bs-dismiss="modal" aria-label="Close" onClick={props.onClose}></button>
+                </div>
+                <div class="modal-body">
+                    <div>{props.children}</div>
+                </div>
+                </div>
+            </div>
         </div>
     )
 } 
@@ -41,7 +51,7 @@ export default function Modal(props){
     return (
         <Fragment>
             {createPortal(<Background onClose={props.onClose}/>, portalElement)}
-            {createPortal(<ModalOverlay>{props.children}</ModalOverlay>, portalElement)}
+            {createPortal(<ModalOverlay onClose={props.onClose}>{props.children}</ModalOverlay>, portalElement)}
         </Fragment>
     )
 }

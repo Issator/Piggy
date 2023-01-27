@@ -16,14 +16,20 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar/>
-      <Routes>
-        <Route path="/"        element={isLogged ? <MainPage/> : <Navigate to={"/signin"}/> }/>
-        <Route path="/signin"  element={!isLogged ? <SignInPage/> : <Navigate to={"/"}/> }/>
-        <Route path="/signup"  element={!isLogged ? <SignUpPage/> : <Navigate to={"/"}/> }/>
-        <Route path="/history" element={isLogged ? <ProductsHistory/> : <Navigate to={"/"}/> }/>
-        <Route path="/account" element={isLogged ? <UserPage id={data._id}/> : <Navigate to={"/"}/> }/>
-        <Route path="/admin"   element={isLogged ? <AdminPage/> : <Navigate to={"/"}/>} />
-      </Routes>
+      <div className="container my-5 mt-2">
+        <div className="row justify-content-center">
+          <div className="col">
+            <Routes>
+              <Route path="/"        element={isLogged ? <MainPage/> : <Navigate to={"/signin"}/> }/>
+              <Route path="/signin"  element={!isLogged ? <SignInPage/> : <Navigate to={"/"}/> }/>
+              <Route path="/signup"  element={!isLogged ? <SignUpPage/> : <Navigate to={"/"}/> }/>
+              <Route path="/history" element={isLogged ? <ProductsHistory/> : <Navigate to={"/"}/> }/>
+              <Route path="/account" element={isLogged ? <UserPage id={data._id}/> : <Navigate to={"/"}/> }/>
+              <Route path="/admin"   element={isLogged ? <AdminPage/> : <Navigate to={"/"}/>} />
+            </Routes>
+          </div>
+        </div>
+      </div>
     </BrowserRouter>
   );
 }

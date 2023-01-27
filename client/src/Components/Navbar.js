@@ -39,11 +39,11 @@ export default function Navbar(){
     const isAdmin = (userCtx.data && userCtx.data.status == "admin")
 
     return (
-        <nav className="row position-sticky top-0 bg-white border border-3 rounded-4 border-primary p-2 m-1" style={{zIndex: "100"}}>
-            <div className="d-flex justify-content-between align-items-center">
-                <Link to={"/"} className="d-flex align-items-center text-black text-decoration-none">
+        <nav className="navbar navbar-light bg-light position-sticky top-0 shadow-sm" style={{zIndex: "100"}}>
+            <div className="container-fluid">
+                <Link to={"/"} className=" navbar-brand">
                     <img src="piggy.png" style={{width: '50px', height: 'auto'}}/>
-                    <h3 className="ms-2">Piggy</h3>
+                    <span className="h3 ms-2">Piggy</span>
                 </Link>
                 <div>
                     {isAdmin && <button type="button" className="btn btn-outline-secondary-dark rounded-4 me-2" onClick={gotoAdmin}>Admin</button>}
